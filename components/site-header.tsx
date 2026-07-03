@@ -45,7 +45,7 @@ export function SiteHeader() {
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 md:h-20 md:px-6">
         <Link href="/" className="flex items-center gap-3" aria-label="Ashborn Aries Label — Home">
           <Image
-            src="/images/ram-emblem.png"
+            src="/images/brand/brand-seal.webp"
             alt=""
             width={40}
             height={40}

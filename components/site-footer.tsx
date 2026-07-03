@@ -30,8 +30,8 @@ export function SiteFooter() {
         <div className="flex max-w-sm flex-col gap-4">
           <div className="flex items-center gap-3">
             <Image
-              src="/images/ram-emblem.png"
-              alt="Ashborn Aries Label ram emblem"
+              src="/images/brand/brand-seal.webp"
+              alt="Ashborn Aries Label brand seal"
               width={48}
               height={48}
               className="h-12 w-12 rounded-full border border-bronze/40 object-cover"

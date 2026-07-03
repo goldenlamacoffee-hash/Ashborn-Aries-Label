@@ -29,7 +29,7 @@ export const metadata: Metadata = {
       'Dark country, Southern gothic, cinematic western, sax lounge, and emotional music forged from fire, ash, pain, discipline, and rebirth.',
     url: 'https://ashbornaries.music',
     siteName: 'Ashborn Aries Label',
-    images: [{ url: '/images/ram-emblem.png', width: 1024, height: 1024 }],
+    images: [{ url: '/images/brand/hero-square.webp', width: 1200, height: 1200 }],
     type: 'website',
   },
   generator: 'v0.app',

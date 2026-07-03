@@ -25,7 +25,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
       {/* Mobile top bar */}
       <div className="flex items-center justify-between border-b border-border bg-card px-4 py-3 md:hidden">
         <Link href="/admin" className="flex items-center gap-3">
-          <Image src="/images/ram-emblem.png" alt="" width={32} height={32} className="rounded-sm" />
+          <Image src="/images/brand/brand-seal.webp" alt="" width={32} height={32} className="rounded-full" />
           <span className="font-serif text-sm tracking-[0.2em] text-foreground">AAL ADMIN</span>
         </Link>
         <button
@@ -47,7 +47,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         )}
       >
         <div className="hidden items-center gap-3 border-b border-border px-6 py-5 md:flex">
-          <Image src="/images/ram-emblem.png" alt="" width={36} height={36} className="rounded-sm" />
+          <Image src="/images/brand/brand-seal.webp" alt="" width={36} height={36} className="rounded-full" />
           <div>
             <p className="font-serif text-sm tracking-[0.2em] text-foreground">AAL ADMIN</p>
             <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Label CMS</p>

@@ -80,8 +80,8 @@ export default function LabelPage() {
         />
         <div className="relative mx-auto flex max-w-3xl flex-col items-center gap-6 px-4 py-20 text-center md:px-6 md:py-28">
           <Image
-            src="/images/ram-emblem.png"
-            alt="Ashborn Aries Label ram emblem"
+            src="/images/brand/brand-seal.webp"
+            alt="Ashborn Aries Label brand seal"
             width={120}
             height={120}
             className="h-28 w-28 rounded-full border border-bronze/50 object-cover"
