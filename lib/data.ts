@@ -79,10 +79,10 @@ export const siteSettings: SiteSettings = {
   siteName: 'Ashborn Aries Label',
   domain: 'ashbornaries.music',
   tagline: 'From fire and pain.',
-  footerLine: 'Real music. Dark roots. No apologies.',
+  footerLine: 'Dark Country. Real Stories. No Compromise.',
   contactEmail: 'contact@ashbornaries.music',
-  heroHeadline: 'ASHBORN ARIES LABEL',
-  heroSubtitle: 'From fire and pain.',
+  heroHeadline: 'Real Music. Rooted in Truth.',
+  heroSubtitle: 'Dark country. Real stories. No compromise.',
   heroCopy:
     'Dark country. Southern gothic. Outlaw soul. Music forged in ash, discipline, and truth.',
   social: [

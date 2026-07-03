@@ -5,8 +5,11 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --font-serif: var(--font-cinzel), serif;
-  --font-sans: var(--font-montserrat), sans-serif;
+  /* Website typography per brand manual p.04:
+     headings Playfair Display, subheadings Cinzel, body Lora */
+  --font-serif: var(--font-playfair), serif;
+  --font-display: var(--font-cinzel), serif;
+  --font-sans: var(--font-lora), serif;
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);

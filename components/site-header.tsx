@@ -51,7 +51,7 @@ export function SiteHeader() {
             height={40}
             className="h-10 w-10 rounded-full border border-bronze/40 object-cover"
           />
-          <span className="font-serif text-sm font-bold uppercase tracking-[0.2em] text-gold md:text-base">
+          <span className="font-display text-sm font-bold uppercase tracking-[0.2em] text-gold md:text-base">
             Ashborn Aries
           </span>
         </Link>

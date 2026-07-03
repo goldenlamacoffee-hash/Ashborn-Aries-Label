@@ -37,7 +37,7 @@ export function SiteFooter() {
               className="h-12 w-12 rounded-full border border-bronze/40 object-cover"
             />
             <div className="flex flex-col">
-              <span className="font-serif text-base font-bold uppercase tracking-[0.2em] text-gold">
+              <span className="font-display text-base font-bold uppercase tracking-[0.2em] text-gold">
                 Ashborn Aries Label
               </span>
               <span className="font-sans text-xs uppercase tracking-widest text-muted-foreground">
@@ -54,7 +54,7 @@ export function SiteFooter() {
         <div className="flex flex-wrap gap-12">
           {columns.map((col) => (
             <nav key={col.heading} aria-label={`Footer — ${col.heading}`}>
-              <h3 className="mb-4 font-serif text-sm font-semibold uppercase tracking-[0.2em] text-gold">
+              <h3 className="mb-4 font-display text-sm font-semibold uppercase tracking-[0.2em] text-gold">
                 {col.heading}
               </h3>
               <ul className="flex flex-col gap-2">

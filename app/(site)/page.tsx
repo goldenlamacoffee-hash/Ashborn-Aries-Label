@@ -36,7 +36,7 @@ export default function HomePage() {
       {/* Latest Releases */}
       <section className="mx-auto max-w-6xl px-4 py-20 md:px-6 md:py-28">
         <div className="mb-12 flex flex-col items-center gap-4 text-center">
-          <p className="font-sans text-xs font-semibold uppercase tracking-[0.3em] text-gold/80">
+          <p className="font-display text-xs font-semibold uppercase tracking-[0.3em] text-gold/80">
             The Catalog
           </p>
           <h2 className="foil-text font-serif text-3xl font-bold uppercase tracking-wide md:text-4xl">
@@ -64,7 +64,7 @@ export default function HomePage() {
             />
           </div>
           <div className="flex flex-col items-center gap-5 text-center md:items-start md:text-left">
-            <p className="font-sans text-xs font-semibold uppercase tracking-[0.3em] text-gold/80">
+            <p className="font-display text-xs font-semibold uppercase tracking-[0.3em] text-gold/80">
               Featured Release
             </p>
             <h2 className="foil-text font-serif text-3xl font-bold uppercase tracking-wide md:text-4xl text-balance">
@@ -103,7 +103,7 @@ export default function HomePage() {
           aria-hidden="true"
         />
         <div className="relative mx-auto flex max-w-3xl flex-col items-center gap-6 px-4 py-20 text-center md:px-6 md:py-28">
-          <p className="font-sans text-xs font-semibold uppercase tracking-[0.3em] text-gold/80">
+          <p className="font-display text-xs font-semibold uppercase tracking-[0.3em] text-gold/80">
             The Label
           </p>
           <h2 className="foil-text font-serif text-3xl font-bold uppercase tracking-wide md:text-4xl">
@@ -125,7 +125,7 @@ export default function HomePage() {
       <section className="border-t border-bronze/20 bg-card/30">
         <div className="mx-auto max-w-6xl px-4 py-20 md:px-6 md:py-28">
           <div className="mb-12 flex flex-col items-center gap-4 text-center">
-            <p className="font-sans text-xs font-semibold uppercase tracking-[0.3em] text-gold/80">
+            <p className="font-display text-xs font-semibold uppercase tracking-[0.3em] text-gold/80">
               The Vault
             </p>
             <h2 className="foil-text font-serif text-3xl font-bold uppercase tracking-wide md:text-4xl">
@@ -145,10 +145,10 @@ export default function HomePage() {
       <section className="border-t border-bronze/20">
         <div className="mx-auto flex max-w-3xl flex-col items-center gap-6 px-4 py-20 text-center md:px-6 md:py-28">
           <h2 className="foil-text font-serif text-3xl font-bold uppercase tracking-wide md:text-4xl">
-            Join the Fire
+            Join the Family
           </h2>
           <p className="max-w-xl font-sans text-sm leading-relaxed text-muted-foreground md:text-base text-pretty">
-            New releases, lyrics, stories, and limited drops from Ashborn Aries Label.
+            Get the latest releases, lyrics, stories, and limited drops from Ashborn Aries Label.
           </p>
           <NewsletterSignup />
         </div>

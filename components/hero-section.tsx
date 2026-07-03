@@ -6,47 +6,47 @@ import { siteSettings } from '@/lib/data'
 export function HeroSection() {
   return (
     <section className="relative overflow-hidden bg-background">
-      {/* Official brand artwork carries the visual identity — including the engraved wordmark. */}
-      <div className="relative aspect-square w-full sm:aspect-[16/9]">
+      {/* Official brand artwork */}
+      <div className="absolute inset-0">
         <Image
           src="/images/brand/hero-wide.webp"
-          alt="Ashborn Aries Label — engraved ram emblem over charred black, ESTD MMXXV"
+          alt=""
           fill
           priority
           sizes="100vw"
-          className="hidden object-cover object-top sm:block"
+          className="hidden object-cover object-top opacity-90 sm:block"
         />
         <Image
           src="/images/brand/hero-square.webp"
-          alt="Ashborn Aries Label — engraved ram emblem over charred black, ESTD MMXXV"
+          alt=""
           fill
           priority
           sizes="100vw"
-          className="object-cover object-top sm:hidden"
+          className="object-cover object-top opacity-90 sm:hidden"
         />
         <div
-          className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent to-background"
+          className="absolute inset-0 bg-gradient-to-b from-background/40 via-background/20 to-background"
           aria-hidden="true"
         />
       </div>
 
       <EmberParticles />
 
-      <div className="relative z-10 mx-auto flex max-w-3xl flex-col items-center gap-5 px-4 pb-24 pt-2 text-center md:px-6">
-        <h1 className="sr-only">{siteSettings.heroHeadline}</h1>
-        <p className="font-serif text-lg uppercase tracking-[0.3em] text-gold md:text-xl">
+      {/* Hero content per brand manual p.04 — bold statement with clear CTAs */}
+      <div className="relative z-10 mx-auto flex min-h-[88svh] max-w-4xl flex-col items-center justify-end gap-5 px-4 pb-20 pt-40 text-center md:px-6 md:pb-24">
+        <p className="font-display text-xs font-semibold uppercase tracking-[0.35em] text-gold/90 md:text-sm">
+          Ashborn Aries Label
+        </p>
+        <h1 className="foil-text font-serif text-4xl font-bold uppercase leading-tight tracking-wide text-balance md:text-6xl">
+          {siteSettings.heroHeadline}
+        </h1>
+        <p className="font-display text-sm uppercase tracking-[0.3em] text-foreground/85 md:text-base">
           {siteSettings.heroSubtitle}
         </p>
-        <p className="max-w-xl font-sans text-sm leading-relaxed text-foreground/80 md:text-base text-pretty">
-          {siteSettings.heroCopy}
-        </p>
-        <div className="mt-2 flex flex-col gap-3 sm:flex-row">
+        <div className="mt-3 flex flex-col gap-3 sm:flex-row">
           <EmberButton href="/releases">Listen Now</EmberButton>
-          <EmberButton href="/releases" variant="secondary">
-            Explore Releases
-          </EmberButton>
-          <EmberButton href="/lyrics" variant="secondary">
-            Enter the Story
+          <EmberButton href="/artists" variant="secondary">
+            Explore Artists
           </EmberButton>
         </div>
       </div>
