@@ -3,11 +3,19 @@
 import { useMemo, useState } from 'react'
 import { cn } from '@/lib/utils'
 import { ReleaseCard } from '@/components/release-card'
-import { releaseFilters, filterReleases, type ReleaseFilter } from '@/lib/data'
+import { releaseFilters, type Release, type ReleaseFilter, type ReleaseTag } from '@/lib/data'
 
-export function ReleaseGrid() {
+function applyFilter(releases: Release[], filter: ReleaseFilter): Release[] {
+  if (filter === 'all') return releases
+  if (filter === 'album' || filter === 'single') {
+    return releases.filter((r) => r.type === filter)
+  }
+  return releases.filter((r) => r.tags.includes(filter as ReleaseTag))
+}
+
+export function ReleaseGrid({ releases }: { releases: Release[] }) {
   const [filter, setFilter] = useState<ReleaseFilter>('all')
-  const filtered = useMemo(() => filterReleases(filter), [filter])
+  const filtered = useMemo(() => applyFilter(releases, filter), [releases, filter])
 
   return (
     <div className="flex flex-col gap-10">

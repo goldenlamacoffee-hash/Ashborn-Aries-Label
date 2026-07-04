@@ -1,14 +1,15 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { getLyricAlbums, getTrack } from '@/lib/data'
+import { getLyricAlbums, getTrack } from '@/lib/cms'
 import { SectionDivider } from '@/components/section-divider'
 import { BronzePanel } from '@/components/bronze-panel'
 import { ShareButtons } from '@/components/share-buttons'
 import { StreamingButtons } from '@/components/streaming-buttons'
 
-export function generateStaticParams() {
-  return getLyricAlbums().flatMap((album) =>
+export async function generateStaticParams() {
+  const albums = await getLyricAlbums()
+  return albums.flatMap((album) =>
     album.tracks.map((track) => ({ albumSlug: album.slug, trackSlug: track.slug })),
   )
 }
@@ -19,7 +20,7 @@ export async function generateMetadata({
   params: Promise<{ albumSlug: string; trackSlug: string }>
 }): Promise<Metadata> {
   const { albumSlug, trackSlug } = await params
-  const result = getTrack(albumSlug, trackSlug)
+  const result = await getTrack(albumSlug, trackSlug)
   if (!result) return {}
   return {
     title: `${result.track.title} — Lyrics`,
@@ -33,7 +34,7 @@ export default async function TrackLyricsPage({
   params: Promise<{ albumSlug: string; trackSlug: string }>
 }) {
   const { albumSlug, trackSlug } = await params
-  const result = getTrack(albumSlug, trackSlug)
+  const result = await getTrack(albumSlug, trackSlug)
   if (!result) notFound()
   const { release, track } = result
 

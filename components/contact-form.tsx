@@ -2,13 +2,31 @@
 
 import { useState } from "react"
 import { EmberButton } from "@/components/ember-button"
+import { sendContactMessage } from "@/app/actions/public"
 
 export function ContactForm() {
-  const [status, setStatus] = useState<"idle" | "sent">("idle")
+  const [status, setStatus] = useState<"idle" | "sending" | "sent">("idle")
+  const [error, setError] = useState<string | null>(null)
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    setStatus("sent")
+    if (status === "sending") return
+    const form = e.currentTarget
+    const data = new FormData(form)
+    setStatus("sending")
+    setError(null)
+    const result = await sendContactMessage({
+      name: String(data.get("name") ?? ""),
+      email: String(data.get("email") ?? ""),
+      subject: String(data.get("subject") ?? ""),
+      message: String(data.get("message") ?? ""),
+    })
+    if (result.ok) {
+      setStatus("sent")
+    } else {
+      setStatus("idle")
+      setError(result.error ?? "Something went wrong. Try again.")
+    }
   }
 
   if (status === "sent") {
@@ -80,8 +98,15 @@ export function ContactForm() {
         />
       </div>
 
-      <div>
-        <EmberButton type="submit">Send Into the Fire</EmberButton>
+      <div className="flex flex-col gap-3">
+        <EmberButton type="submit">
+          {status === "sending" ? "Sending…" : "Send Into the Fire"}
+        </EmberButton>
+        {error && (
+          <p role="alert" className="font-sans text-xs text-ember">
+            {error}
+          </p>
+        )}
       </div>
     </form>
   )
