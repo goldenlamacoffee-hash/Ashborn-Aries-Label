@@ -74,8 +74,7 @@ export default function HomePage() {
               {featured.artistName} · {featured.mood}
             </p>
             <p className="max-w-xl font-sans text-sm leading-relaxed text-foreground/80 md:text-base text-pretty">
-              A dark country concept album about fire, pain, discipline, love, scars, and rebirth. A
-              man walking through hell and coming back with fire in his chest.
+              {featured.description}
             </p>
             <div className="mt-2 flex flex-col gap-3 sm:flex-row">
               <EmberButton href={`/releases/${featured.slug}`}>Read the Story</EmberButton>
@@ -145,7 +144,7 @@ export default function HomePage() {
       <section className="border-t border-bronze/20">
         <div className="mx-auto flex max-w-3xl flex-col items-center gap-6 px-4 py-20 text-center md:px-6 md:py-28">
           <h2 className="foil-text font-serif text-3xl font-bold uppercase tracking-wide md:text-4xl">
-            Join the Family
+            Join the Herd
           </h2>
           <p className="max-w-xl font-sans text-sm leading-relaxed text-muted-foreground md:text-base text-pretty">
             Get the latest releases, lyrics, stories, and limited drops from Ashborn Aries Label.

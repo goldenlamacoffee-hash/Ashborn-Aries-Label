@@ -18,7 +18,7 @@ export function NewsletterSignup({ compact = false }: { compact?: boolean }) {
   if (status === 'done') {
     return (
       <p className="font-serif text-lg tracking-wide text-gold">
-        {'You are in. Welcome to the fire.'}
+        {'You are in. Welcome to the herd.'}
       </p>
     )
   }

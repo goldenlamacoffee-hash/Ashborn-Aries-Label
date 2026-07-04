@@ -4,13 +4,13 @@ import { cn } from '@/lib/utils'
 type Variant = 'primary' | 'secondary' | 'ghost'
 
 const base =
-  'inline-flex items-center justify-center gap-2 font-sans text-sm font-semibold uppercase tracking-widest px-6 py-3 rounded-sm border transition-all duration-300 ember-glow'
+  'inline-flex items-center justify-center gap-2 font-display text-sm font-semibold uppercase tracking-widest px-6 py-3 rounded-sm border transition-all duration-300 ember-glow'
 
 const variants: Record<Variant, string> = {
   primary:
-    'bg-primary text-primary-foreground border-primary hover:bg-gold hover:-translate-y-0.5',
+    'bg-gradient-to-b from-copper to-[#3d1a0f] text-foreground border-gold/80 hover:border-gold hover:-translate-y-0.5',
   secondary:
-    'bg-transparent text-primary border-bronze hover:text-gold hover:-translate-y-0.5',
+    'bg-transparent text-gold border-bronze hover:text-foreground hover:border-gold hover:-translate-y-0.5',
   ghost:
     'bg-transparent text-muted-foreground border-transparent hover:text-gold',
 }
