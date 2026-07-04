@@ -80,7 +80,7 @@ export function SaveButton({ onClick, className }: { onClick?: () => void; class
         Save Changes
       </button>
       <span aria-live="polite" className={cn("text-xs text-accent transition-opacity", saved ? "opacity-100" : "opacity-0")}>
-        Saved. Content updates in this demo session; connect a database to persist.
+        Saved to the database.
       </span>
     </div>
   )

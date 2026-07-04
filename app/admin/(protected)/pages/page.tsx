@@ -16,7 +16,7 @@ export default function AdminPagesPage() {
     <>
       <AdminPageHeader
         title="Pages"
-        description="Every public page and what it exposes for editing. Page copy lives in the data layer (lib/data.ts) and moves to the database when connected."
+        description="Every public page and what it exposes for editing. Catalog and settings content is stored in the database and edited from this admin."
       />
 
       <AdminTable headers={["Page", "Route", "Editable content", "Status", ""]}>

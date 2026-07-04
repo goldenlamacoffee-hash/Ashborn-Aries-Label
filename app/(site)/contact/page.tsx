@@ -15,7 +15,7 @@ export default function ContactPage() {
       <PageHero
         eyebrow="Reach Us"
         title="Contact"
-        description="Licensing, press, collaboration — or anything worth saying. Keep it honest. We answer what matters."
+        copy="Licensing, press, collaboration — or anything worth saying. Keep it honest. We answer what matters."
       />
 
       <section className="mx-auto max-w-6xl px-6 pb-24">
