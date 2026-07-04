@@ -15,7 +15,8 @@ const navItems = [
   { href: "/admin/messages", label: "Messages" },
   { href: "/admin/newsletter", label: "Newsletter" },
   { href: "/admin/pages", label: "Pages" },
-  { href: "/admin/media", label: "Media / Gallery" },
+  { href: "/admin/media", label: "Media Library" },
+  { href: "/admin/gallery", label: "Gallery" },
   { href: "/admin/settings", label: "Settings" },
 ]
 

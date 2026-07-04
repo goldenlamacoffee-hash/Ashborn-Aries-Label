@@ -191,3 +191,132 @@ export function MediaPicker({
     </div>
   )
 }
+
+/**
+ * Standalone modal picker returning the full MediaAsset — used by the
+ * gallery manager to add library assets to a collection.
+ */
+export function MediaAssetPickerDialog({
+  open,
+  onClose,
+  onSelect,
+}: {
+  open: boolean
+  onClose: () => void
+  onSelect: (asset: MediaAsset) => void
+}) {
+  const [assets, setAssets] = useState<MediaAsset[] | null>(null)
+  const [search, setSearch] = useState('')
+  const [category, setCategory] = useState('all')
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    if (!open || assets !== null) return
+    setLoading(true)
+    adminListMediaAssets()
+      .then(setAssets)
+      .finally(() => setLoading(false))
+  }, [open, assets])
+
+  const filtered = useMemo(() => {
+    if (!assets) return []
+    const q = search.trim().toLowerCase()
+    return assets.filter((a) => {
+      if (category !== 'all' && a.category !== category) return false
+      if (q) {
+        const haystack = [a.title, a.name, a.filename, a.url, ...a.tags].join(' ').toLowerCase()
+        if (!haystack.includes(q)) return false
+      }
+      return true
+    })
+  }, [assets, search, category])
+
+  if (!open) return null
+
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label="Choose media asset"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-4"
+      onClick={onClose}
+    >
+      <div
+        className="flex max-h-[80vh] w-full max-w-3xl flex-col gap-3 overflow-hidden border border-bronze/60 bg-card p-4"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between gap-3">
+          <h3 className="font-serif text-lg text-foreground">Choose from Media Library</h3>
+          <button
+            type="button"
+            onClick={onClose}
+            className="border border-border px-3 py-1.5 text-[10px] uppercase tracking-widest text-muted-foreground hover:text-foreground"
+          >
+            Close
+          </button>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <input
+            type="search"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search media…"
+            aria-label="Search media"
+            className="min-w-[160px] flex-1 border border-input bg-secondary px-3 py-1.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-gold focus:outline-none"
+          />
+          <select
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            aria-label="Filter by category"
+            className="border border-input bg-secondary px-2 py-1.5 text-sm text-foreground"
+          >
+            <option value="all">All Categories</option>
+            {MEDIA_CATEGORIES.map((c) => (
+              <option key={c} value={c}>
+                {labelize(c)}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="min-h-0 flex-1 overflow-y-auto">
+          {loading ? (
+            <p className="p-4 text-center text-sm text-muted-foreground">Loading media…</p>
+          ) : filtered.length === 0 ? (
+            <p className="p-4 text-center text-sm text-muted-foreground">
+              No media found. Add assets in the Media Library.
+            </p>
+          ) : (
+            <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-6">
+              {filtered.map((a) => {
+                const url = a.url || a.path
+                return (
+                  <button
+                    key={a.id}
+                    type="button"
+                    onClick={() => onSelect(a)}
+                    title={a.title}
+                    className="group relative flex flex-col border border-border text-left transition-colors hover:border-bronze"
+                  >
+                    <span className="relative block aspect-square w-full overflow-hidden">
+                      <Image
+                        src={url || '/placeholder.svg'}
+                        alt={a.altText || a.title}
+                        fill
+                        className="object-cover"
+                        sizes="120px"
+                        unoptimized={!url.startsWith('/')}
+                      />
+                    </span>
+                    <span className="block truncate px-1.5 py-1 text-[10px] text-muted-foreground group-hover:text-foreground">
+                      {a.title || a.name}
+                    </span>
+                  </button>
+                )
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
