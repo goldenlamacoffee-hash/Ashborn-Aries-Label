@@ -2,14 +2,15 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
-import { getReleaseBySlug, getReleases } from '@/lib/data'
+import { getReleaseBySlug, getReleases } from '@/lib/cms'
 import { StreamingButtons } from '@/components/streaming-buttons'
 import { ShareButtons } from '@/components/share-buttons'
 import { SectionDivider } from '@/components/section-divider'
 import { BronzePanel } from '@/components/bronze-panel'
 
-export function generateStaticParams() {
-  return getReleases().map((r) => ({ slug: r.slug }))
+export async function generateStaticParams() {
+  const releases = await getReleases()
+  return releases.map((r) => ({ slug: r.slug }))
 }
 
 export async function generateMetadata({
@@ -18,7 +19,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>
 }): Promise<Metadata> {
   const { slug } = await params
-  const release = getReleaseBySlug(slug)
+  const release = await getReleaseBySlug(slug)
   if (!release) return {}
   return {
     title: release.title,
@@ -33,7 +34,7 @@ export default async function ReleaseDetailPage({
   params: Promise<{ slug: string }>
 }) {
   const { slug } = await params
-  const release = getReleaseBySlug(slug)
+  const release = await getReleaseBySlug(slug)
   if (!release) notFound()
 
   const hasLyricArchive = release.type === 'album'

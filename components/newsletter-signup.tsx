@@ -2,17 +2,26 @@
 
 import { useState } from 'react'
 import { EmberButton } from '@/components/ember-button'
+import { subscribeToNewsletter } from '@/app/actions/public'
 
 export function NewsletterSignup({ compact = false }: { compact?: boolean }) {
   const [email, setEmail] = useState('')
-  const [status, setStatus] = useState<'idle' | 'done'>('idle')
+  const [status, setStatus] = useState<'idle' | 'saving' | 'done'>('idle')
+  const [error, setError] = useState<string | null>(null)
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!email.trim()) return
-    // Seeded data layer — subscriber storage is wired to the CMS later.
-    setStatus('done')
-    setEmail('')
+    if (!email.trim() || status === 'saving') return
+    setStatus('saving')
+    setError(null)
+    const result = await subscribeToNewsletter(email)
+    if (result.ok) {
+      setStatus('done')
+      setEmail('')
+    } else {
+      setStatus('idle')
+      setError(result.error ?? 'Something went wrong.')
+    }
   }
 
   if (status === 'done') {
@@ -41,8 +50,13 @@ export function NewsletterSignup({ compact = false }: { compact?: boolean }) {
         className="h-12 flex-1 rounded-sm border border-bronze/50 bg-background px-4 font-sans text-sm text-foreground placeholder:text-muted-foreground focus:border-gold focus:outline-none"
       />
       <EmberButton type="submit" className="h-12">
-        Join
+        {status === 'saving' ? 'Joining…' : 'Join'}
       </EmberButton>
+      {error && (
+        <p role="alert" className="font-sans text-xs text-ember">
+          {error}
+        </p>
+      )}
     </form>
   )
 }

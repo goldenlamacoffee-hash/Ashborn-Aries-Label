@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { PageHero } from '@/components/page-hero'
 import { ArtistCard } from '@/components/artist-card'
-import { getArtists } from '@/lib/data'
+import { getArtists } from '@/lib/cms'
 
 export const metadata: Metadata = {
   title: 'Artists',
@@ -9,8 +9,8 @@ export const metadata: Metadata = {
     'The Ashborn Aries Label roster — dark country, sax lounge, and cinematic instrumental projects.',
 }
 
-export default function ArtistsPage() {
-  const artists = getArtists()
+export default async function ArtistsPage() {
+  const artists = await getArtists()
 
   return (
     <>

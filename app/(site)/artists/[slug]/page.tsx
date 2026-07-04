@@ -2,14 +2,15 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
-import { getArtistBySlug, getArtists, getReleasesByArtist } from '@/lib/data'
+import { getArtistBySlug, getArtists, getReleasesByArtist } from '@/lib/cms'
 import { ReleaseCard } from '@/components/release-card'
 import { SectionDivider } from '@/components/section-divider'
 import { BronzePanel } from '@/components/bronze-panel'
 import { StreamingButtons } from '@/components/streaming-buttons'
 
-export function generateStaticParams() {
-  return getArtists().map((a) => ({ slug: a.slug }))
+export async function generateStaticParams() {
+  const artists = await getArtists()
+  return artists.map((a) => ({ slug: a.slug }))
 }
 
 export async function generateMetadata({
@@ -18,7 +19,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>
 }): Promise<Metadata> {
   const { slug } = await params
-  const artist = getArtistBySlug(slug)
+  const artist = await getArtistBySlug(slug)
   if (!artist) return {}
   return { title: artist.name, description: artist.tagline }
 }
@@ -29,10 +30,10 @@ export default async function ArtistDetailPage({
   params: Promise<{ slug: string }>
 }) {
   const { slug } = await params
-  const artist = getArtistBySlug(slug)
+  const artist = await getArtistBySlug(slug)
   if (!artist) notFound()
 
-  const releases = getReleasesByArtist(artist.slug)
+  const releases = await getReleasesByArtist(artist.slug)
 
   return (
     <div className="mx-auto max-w-5xl px-4 pb-24 pt-32 md:px-6 md:pt-40">

@@ -42,7 +42,7 @@ export default function VisualWorldPage() {
       <PageHero
         eyebrow="The Aesthetic"
         title="Visual World"
-        description="Darkness is our canvas. Ember is our light. This is the world every release, every frame, and every mark belongs to."
+        copy="Darkness is our canvas. Ember is our light. This is the world every release, every frame, and every mark belongs to."
       />
 
       <section className="mx-auto max-w-6xl px-6 pb-24">

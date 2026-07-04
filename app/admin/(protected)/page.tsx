@@ -1,31 +1,39 @@
-import Link from "next/link"
-import { releases, artists } from "@/lib/data"
-import { AdminPageHeader, StatCard } from "@/components/admin/admin-ui"
+import Link from 'next/link'
+import { adminGetStats, adminListReleases } from '@/app/actions/admin'
+import { AdminPageHeader, StatCard } from '@/components/admin/admin-ui'
 
-export default function AdminDashboard() {
-  const trackCount = releases.reduce((n, r) => n + r.tracks.length, 0)
-  const albums = releases.filter((r) => r.type === "album").length
-  const singles = releases.filter((r) => r.type === "single").length
+export default async function AdminDashboard() {
+  const [stats, releases] = await Promise.all([adminGetStats(), adminListReleases()])
 
   const quickLinks = [
-    { href: "/admin/releases", label: "Manage Releases", note: "Covers, dates, streaming links" },
-    { href: "/admin/tracks", label: "Edit Tracks & Lyrics", note: "Lyrics, story notes, credits" },
-    { href: "/admin/artists", label: "Manage Artists", note: "Bios, images, project links" },
-    { href: "/admin/settings", label: "Site Settings", note: "Hero text, SEO, social, contact" },
+    { href: '/admin/releases', label: 'Manage Releases', note: 'Covers, dates, streaming links' },
+    { href: '/admin/tracks', label: 'Edit Tracks & Lyrics', note: 'Lyrics, story notes, credits' },
+    { href: '/admin/artists', label: 'Manage Artists', note: 'Bios, images, project links' },
+    { href: '/admin/messages', label: 'Messages', note: `${stats.messagesUnread} unread` },
+    { href: '/admin/newsletter', label: 'Newsletter', note: `${stats.subscribers} subscribers` },
+    { href: '/admin/settings', label: 'Site Settings', note: 'Hero text, SEO, social, contact' },
   ]
 
   return (
     <>
       <AdminPageHeader
         title="Dashboard"
-        description="Overview of the Ashborn Aries Label catalog. All content is seeded and editable; connect a database (Neon) later to persist changes."
+        description="Overview of the Ashborn Aries Label catalog. All content is stored in the database — changes go live immediately."
       />
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <StatCard label="Releases" value={String(releases.length)} sub={`${albums} albums \u00B7 ${singles} singles`} />
-        <StatCard label="Tracks" value={String(trackCount)} sub="With lyrics & story notes" />
-        <StatCard label="Artists / Projects" value={String(artists.length)} sub="Editable placeholder profiles" />
-        <StatCard label="Subscribers" value="0" sub="Newsletter — awaiting database" />
+        <StatCard
+          label="Releases"
+          value={String(stats.releases)}
+          sub={`${stats.releasesPublished} published`}
+        />
+        <StatCard label="Tracks" value={String(stats.tracks)} sub="With lyrics & story notes" />
+        <StatCard label="Artists / Projects" value={String(stats.artists)} sub="On the roster" />
+        <StatCard
+          label="Subscribers"
+          value={String(stats.subscribers)}
+          sub={`${stats.messagesUnread} unread message${stats.messagesUnread === 1 ? '' : 's'}`}
+        />
       </div>
 
       <section className="mt-10">
@@ -54,7 +62,8 @@ export default function AdminDashboard() {
               <div>
                 <p className="text-sm text-foreground">{r.title}</p>
                 <p className="text-xs text-muted-foreground">
-                  {r.artistName} {"\u00B7"} {r.type} {"\u00B7"} {r.releaseDate}
+                  {r.type} {'\u00B7'} {r.releaseDate} {'\u00B7'}{' '}
+                  {r.published ? 'Published' : 'Draft'}
                 </p>
               </div>
               <Link

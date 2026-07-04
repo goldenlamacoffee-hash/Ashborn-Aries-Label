@@ -5,7 +5,7 @@ import { ReleaseCard } from '@/components/release-card'
 import { EmberButton } from '@/components/ember-button'
 import { StoryCard } from '@/components/story-card'
 import { NewsletterSignup } from '@/components/newsletter-signup'
-import { getReleases, getFeaturedRelease } from '@/lib/data'
+import { getReleases, getFeaturedRelease } from '@/lib/cms'
 
 const storyPreviews = [
   {
@@ -25,9 +25,11 @@ const storyPreviews = [
   },
 ]
 
-export default function HomePage() {
-  const releases = getReleases()
-  const featured = getFeaturedRelease()
+export default async function HomePage() {
+  const releases = await getReleases()
+  const featuredMaybe = await getFeaturedRelease()
+  if (!featuredMaybe) return null
+  const featured = featuredMaybe
 
   return (
     <>

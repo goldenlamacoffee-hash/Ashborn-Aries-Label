@@ -1,9 +1,10 @@
 import Image from 'next/image'
 import { EmberButton } from '@/components/ember-button'
 import { EmberParticles } from '@/components/ember-particles'
-import { siteSettings } from '@/lib/data'
+import { getSiteSettings } from '@/lib/cms'
 
-export function HeroSection() {
+export async function HeroSection() {
+  const siteSettings = await getSiteSettings()
   return (
     <section className="relative overflow-hidden bg-background">
       {/* Official brand artwork */}

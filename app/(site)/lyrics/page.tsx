@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { PageHero } from '@/components/page-hero'
 import { LyricsArchive } from '@/components/lyrics-archive'
-import { getLyricAlbums } from '@/lib/data'
+import { getLyricAlbums } from '@/lib/cms'
 
 export const metadata: Metadata = {
   title: 'Lyrics & Stories',
@@ -9,8 +9,8 @@ export const metadata: Metadata = {
     'The Ashborn Aries Label lyric and story archive — verses, story notes, and spoken words from every album.',
 }
 
-export default function LyricsPage() {
-  const albums = getLyricAlbums()
+export default async function LyricsPage() {
+  const albums = await getLyricAlbums()
 
   return (
     <>

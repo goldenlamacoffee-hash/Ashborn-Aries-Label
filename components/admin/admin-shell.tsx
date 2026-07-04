@@ -3,22 +3,38 @@
 import { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
+import { authClient } from "@/lib/auth-client"
 
 const navItems = [
   { href: "/admin", label: "Dashboard" },
   { href: "/admin/releases", label: "Releases" },
   { href: "/admin/tracks", label: "Tracks / Lyrics" },
   { href: "/admin/artists", label: "Artists" },
+  { href: "/admin/messages", label: "Messages" },
+  { href: "/admin/newsletter", label: "Newsletter" },
   { href: "/admin/pages", label: "Pages" },
   { href: "/admin/media", label: "Media / Gallery" },
   { href: "/admin/settings", label: "Settings" },
 ]
 
-export function AdminShell({ children }: { children: React.ReactNode }) {
+export function AdminShell({
+  children,
+  userName,
+}: {
+  children: React.ReactNode
+  userName?: string
+}) {
   const pathname = usePathname()
+  const router = useRouter()
   const [open, setOpen] = useState(false)
+
+  async function handleSignOut() {
+    await authClient.signOut()
+    router.push("/admin/login")
+    router.refresh()
+  }
 
   return (
     <div className="flex min-h-screen flex-col bg-background md:flex-row">
@@ -73,10 +89,22 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             )
           })}
         </nav>
-        <div className="hidden border-t border-border p-4 md:block">
+        <div className="flex flex-col gap-3 border-t border-border p-4">
+          {userName && (
+            <p className="truncate font-sans text-xs text-muted-foreground" title={userName}>
+              {userName}
+            </p>
+          )}
           <Link href="/" className="text-xs uppercase tracking-widest text-muted-foreground hover:text-accent">
             {"\u2190 Back to site"}
           </Link>
+          <button
+            type="button"
+            onClick={handleSignOut}
+            className="text-left text-xs uppercase tracking-widest text-muted-foreground hover:text-accent"
+          >
+            Sign out
+          </button>
         </div>
       </aside>
 

@@ -2,11 +2,12 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
-import { getLyricAlbums, getReleaseBySlug } from '@/lib/data'
+import { getLyricAlbums, getReleaseBySlug } from '@/lib/cms'
 import { SectionDivider } from '@/components/section-divider'
 
-export function generateStaticParams() {
-  return getLyricAlbums().map((a) => ({ albumSlug: a.slug }))
+export async function generateStaticParams() {
+  const albums = await getLyricAlbums()
+  return albums.map((a) => ({ albumSlug: a.slug }))
 }
 
 export async function generateMetadata({
@@ -15,7 +16,7 @@ export async function generateMetadata({
   params: Promise<{ albumSlug: string }>
 }): Promise<Metadata> {
   const { albumSlug } = await params
-  const album = getReleaseBySlug(albumSlug)
+  const album = await getReleaseBySlug(albumSlug)
   if (!album) return {}
   return {
     title: `${album.title} — Lyrics & Stories`,
@@ -29,7 +30,7 @@ export default async function AlbumLyricsPage({
   params: Promise<{ albumSlug: string }>
 }) {
   const { albumSlug } = await params
-  const album = getReleaseBySlug(albumSlug)
+  const album = await getReleaseBySlug(albumSlug)
   if (!album || album.type !== 'album') notFound()
 
   return (

@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import { siteSettings } from '@/lib/data'
+import { getSiteSettings } from '@/lib/cms'
 
 const columns = [
   {
@@ -23,7 +23,8 @@ const columns = [
   },
 ]
 
-export function SiteFooter() {
+export async function SiteFooter() {
+  const siteSettings = await getSiteSettings()
   return (
     <footer className="border-t border-bronze/30 bg-background">
       <div className="mx-auto flex max-w-6xl flex-col gap-12 px-4 py-14 md:flex-row md:justify-between md:px-6">
