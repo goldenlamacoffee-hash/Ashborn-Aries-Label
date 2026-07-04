@@ -21,24 +21,37 @@ const lora = Lora({
   weight: ['400', '500', '600'],
 })
 
-export const metadata: Metadata = {
-  title: {
-    default: 'Ashborn Aries Label — From Fire and Pain',
-    template: '%s — Ashborn Aries Label',
-  },
-  description:
-    'Official home of Ashborn Aries Label. Dark country, Southern gothic, cinematic western, sax lounge, and emotional music forged from fire, ash, pain, discipline, and rebirth.',
-  metadataBase: new URL('https://ashbornaries.music'),
-  openGraph: {
-    title: 'Ashborn Aries Label — From Fire and Pain',
+export async function generateMetadata(): Promise<Metadata> {
+  let ogImage = '/images/brand/hero-square.webp'
+  let faviconUrl = ''
+  try {
+    const { getSiteSettings } = await import('@/lib/cms')
+    const settings = await getSiteSettings()
+    if (settings.ogImage) ogImage = settings.ogImage
+    if (settings.faviconUrl) faviconUrl = settings.faviconUrl
+  } catch {
+    // fall back to the default OG image if the database is unavailable
+  }
+  return {
+    ...(faviconUrl ? { icons: { icon: faviconUrl } } : {}),
+    title: {
+      default: 'Ashborn Aries Label — From Fire and Pain',
+      template: '%s — Ashborn Aries Label',
+    },
     description:
-      'Dark country, Southern gothic, cinematic western, sax lounge, and emotional music forged from fire, ash, pain, discipline, and rebirth.',
-    url: 'https://ashbornaries.music',
-    siteName: 'Ashborn Aries Label',
-    images: [{ url: '/images/brand/hero-square.webp', width: 1200, height: 1200 }],
-    type: 'website',
-  },
-  generator: 'v0.app',
+      'Official home of Ashborn Aries Label. Dark country, Southern gothic, cinematic western, sax lounge, and emotional music forged from fire, ash, pain, discipline, and rebirth.',
+    metadataBase: new URL('https://ashbornaries.music'),
+    openGraph: {
+      title: 'Ashborn Aries Label — From Fire and Pain',
+      description:
+        'Dark country, Southern gothic, cinematic western, sax lounge, and emotional music forged from fire, ash, pain, discipline, and rebirth.',
+      url: 'https://ashbornaries.music',
+      siteName: 'Ashborn Aries Label',
+      images: [{ url: ogImage, width: 1200, height: 1200 }],
+      type: 'website',
+    },
+    generator: 'v0.app',
+  }
 }
 
 export const viewport: Viewport = {

@@ -17,7 +17,7 @@ const navLinks = [
   { href: '/contact', label: 'Contact' },
 ]
 
-export function SiteHeader() {
+export function SiteHeader({ logoUrl }: { logoUrl?: string }) {
   const [scrolled, setScrolled] = useState(false)
   const [open, setOpen] = useState(false)
   const pathname = usePathname()
@@ -45,7 +45,7 @@ export function SiteHeader() {
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 md:h-20 md:px-6">
         <Link href="/" className="flex items-center gap-3" aria-label="Ashborn Aries Label — Home">
           <Image
-            src="/images/brand/brand-seal.webp"
+            src={logoUrl || '/images/brand/brand-seal.webp'}
             alt=""
             width={40}
             height={40}

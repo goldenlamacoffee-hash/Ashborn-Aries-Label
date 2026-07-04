@@ -1,4 +1,5 @@
 import { auth } from '@/lib/auth'
+import { pool } from '@/lib/db'
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 import Image from 'next/image'
@@ -11,6 +12,9 @@ export const metadata = {
 export default async function AdminLoginPage() {
   const session = await auth.api.getSession({ headers: await headers() })
   if (session?.user) redirect('/admin')
+
+  const { rows } = await pool.query('SELECT 1 FROM "user" LIMIT 1')
+  const allowSignUp = rows.length === 0
 
   return (
     <main className="flex min-h-svh items-center justify-center bg-background px-4">
@@ -30,7 +34,7 @@ export default async function AdminLoginPage() {
             Sign in to manage the catalog.
           </p>
         </div>
-        <AdminLoginForm />
+        <AdminLoginForm allowSignUp={allowSignUp} />
       </div>
     </main>
   )

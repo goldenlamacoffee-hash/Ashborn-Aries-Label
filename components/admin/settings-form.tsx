@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { adminSetSetting } from '@/app/actions/admin'
 import { AdminField, adminInputClass } from '@/components/admin/admin-ui'
+import { MediaPicker } from '@/components/admin/media-picker'
 import type { SiteSettings } from '@/lib/data'
 
 export function SettingsForm({ initial }: { initial: SiteSettings }) {
@@ -63,6 +64,68 @@ export function SettingsForm({ initial }: { initial: SiteSettings }) {
               onChange={(e) => update({ heroCopy: e.target.value })}
             />
           </AdminField>
+        </div>
+      </section>
+
+      <section className="border border-border bg-card p-6">
+        <h2 className="font-serif text-xl text-foreground">Branding & media</h2>
+        <div className="mt-6 flex flex-col gap-6">
+          <MediaPicker
+            label="Main logo / brand seal"
+            value={settings.logoUrl}
+            onChange={(url) => update({ logoUrl: url })}
+            categoryHint="logo"
+            hint="Used in the site header, footer, and admin."
+          />
+          <MediaPicker
+            label="Homepage hero image"
+            value={settings.heroImage}
+            onChange={(url) => update({ heroImage: url })}
+            categoryHint="hero-background"
+            hint="Full-width artwork behind the homepage hero."
+          />
+          <MediaPicker
+            label="Default OG / social share image"
+            value={settings.ogImage}
+            onChange={(url) => update({ ogImage: url })}
+            categoryHint="seo-og"
+            hint="Shown when pages are shared on social platforms."
+          />
+          <MediaPicker
+            label="Footer logo (optional)"
+            value={settings.footerLogoUrl}
+            onChange={(url) => update({ footerLogoUrl: url })}
+            categoryHint="logo"
+            hint="Overrides the main logo in the footer. Leave empty to reuse the main logo."
+          />
+          <MediaPicker
+            label="Favicon (optional)"
+            value={settings.faviconUrl}
+            onChange={(url) => update({ faviconUrl: url })}
+            categoryHint="logo"
+            hint="Browser tab icon. Square images work best."
+          />
+          <MediaPicker
+            label="Interior page hero background"
+            value={settings.pageHeroBackground}
+            onChange={(url) => update({ pageHeroBackground: url })}
+            categoryHint="hero-background"
+            hint="Background behind the header of Releases, Artists, Lyrics, Label, Contact, and Visual World pages."
+          />
+          <MediaPicker
+            label="Label page section background"
+            value={settings.labelSectionBackground}
+            onChange={(url) => update({ labelSectionBackground: url })}
+            categoryHint="section-background"
+            hint="Background of the emblem statement section on the Label page."
+          />
+          <MediaPicker
+            label="Homepage story section background"
+            value={settings.homeSectionBackground}
+            onChange={(url) => update({ homeSectionBackground: url })}
+            categoryHint="section-background"
+            hint="Background of the label story section on the homepage."
+          />
         </div>
       </section>
 

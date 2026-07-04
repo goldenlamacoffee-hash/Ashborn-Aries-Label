@@ -25,6 +25,9 @@ export async function generateMetadata({
   return {
     title: `${result.track.title} — Lyrics`,
     description: result.track.storyNote,
+    ...(result.release.coverImage
+      ? { openGraph: { images: [{ url: result.release.coverImage }] } }
+      : {}),
   }
 }
 

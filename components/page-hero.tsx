@@ -1,21 +1,26 @@
 import { SectionDivider } from '@/components/section-divider'
+import { getSiteSettings } from '@/lib/cms'
 
-/** Shared cinematic header for interior pages. */
-export function PageHero({
+/** Shared cinematic header for interior pages. Background is CMS-managed. */
+export async function PageHero({
   eyebrow,
   title,
   copy,
+  backgroundImage,
 }: {
   eyebrow?: string
   title: string
   copy?: string
+  backgroundImage?: string
 }) {
+  const settings = await getSiteSettings()
+  const bg = backgroundImage || settings.pageHeroBackground || '/images/brand/hero-wide.webp'
   return (
     <section className="relative overflow-hidden border-b border-bronze/20 bg-background pb-14 pt-32 md:pb-20 md:pt-44">
       <div
         className="absolute inset-0 opacity-40"
         style={{
-          backgroundImage: 'url(/images/brand/hero-wide.webp)',
+          backgroundImage: `url(${bg})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center 22%',
         }}

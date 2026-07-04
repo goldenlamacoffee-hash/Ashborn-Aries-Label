@@ -4,6 +4,7 @@ import { PageHero } from '@/components/page-hero'
 import { BronzePanel } from '@/components/bronze-panel'
 import { EmberButton } from '@/components/ember-button'
 import { SectionDivider } from '@/components/section-divider'
+import { getSiteSettings } from '@/lib/cms'
 
 export const metadata: Metadata = {
   title: 'The Label',
@@ -38,7 +39,8 @@ const pillars = [
   },
 ]
 
-export default function LabelPage() {
+export default async function LabelPage() {
+  const settings = await getSiteSettings()
   return (
     <>
       <PageHero
@@ -68,7 +70,7 @@ export default function LabelPage() {
         <div
           className="absolute inset-0 opacity-20"
           style={{
-            backgroundImage: 'url(/images/visual/bronze-ember.png)',
+            backgroundImage: `url(${settings.labelSectionBackground || '/images/visual/bronze-ember.png'})`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
           }}
@@ -80,7 +82,7 @@ export default function LabelPage() {
         />
         <div className="relative mx-auto flex max-w-3xl flex-col items-center gap-6 px-4 py-20 text-center md:px-6 md:py-28">
           <Image
-            src="/images/brand/brand-seal.webp"
+            src={settings.logoUrl || '/images/brand/brand-seal.webp'}
             alt="Ashborn Aries Label brand seal"
             width={120}
             height={120}

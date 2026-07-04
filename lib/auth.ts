@@ -1,8 +1,26 @@
 import { betterAuth } from 'better-auth'
+import { APIError } from 'better-auth/api'
 import { pool } from '@/lib/db'
 
 export const auth = betterAuth({
   database: pool,
+  databaseHooks: {
+    user: {
+      create: {
+        // Registration is reserved for the owner: once the first account
+        // exists, all further sign-ups are rejected server-side.
+        before: async (user) => {
+          const { rows } = await pool.query('SELECT 1 FROM "user" LIMIT 1')
+          if (rows.length > 0) {
+            throw new APIError('FORBIDDEN', {
+              message: 'Registration is closed. Contact the site owner.',
+            })
+          }
+          return { data: user }
+        },
+      },
+    },
+  },
   baseURL:
     process.env.BETTER_AUTH_URL ??
     (process.env.VERCEL_PROJECT_PRODUCTION_URL

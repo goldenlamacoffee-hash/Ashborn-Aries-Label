@@ -1,0 +1,333 @@
+'use server'
+
+import { requireAdmin } from '@/lib/admin'
+import { db } from '@/lib/db'
+import {
+  galleryCollections,
+  galleryItems,
+  mediaAssets,
+  type GalleryCollection,
+  type GalleryItem,
+  type MediaAsset,
+} from '@/lib/db/schema'
+import {
+  detectProvider,
+  filenameFromUrl,
+  isValidAssetUrl,
+} from '@/lib/media/storage'
+import { getMediaUsage, getUsedAssetKeys, type MediaUsage } from '@/lib/media/get-media-usage'
+import { asc, desc, eq } from 'drizzle-orm'
+import { revalidatePath } from 'next/cache'
+import { z } from 'zod'
+
+function revalidateMedia() {
+  revalidatePath('/admin/media')
+  revalidatePath('/admin/gallery')
+  revalidatePath('/', 'layout')
+}
+
+/* ------------------------------------------------------------------ */
+/* Media assets                                                        */
+/* ------------------------------------------------------------------ */
+
+const mediaInputSchema = z
+  .object({
+    url: z.string().min(1, 'Image URL is required.'),
+    title: z.string().min(1, 'Title is required.'),
+    altText: z.string().default(''),
+    caption: z.string().default(''),
+    description: z.string().default(''),
+    category: z.string().min(1, 'Category is required.'),
+    type: z.string().default('image'),
+    tags: z.array(z.string()).default([]),
+    isPublic: z.boolean().default(true),
+  })
+  .superRefine((val, ctx) => {
+    if (!isValidAssetUrl(val.url)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['url'],
+        message: 'URL must be a valid http(s) URL or a local /path.',
+      })
+    }
+    if (val.isPublic && val.type === 'image' && !val.altText.trim()) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['altText'],
+        message: 'Alt text is required for public images.',
+      })
+    }
+  })
+
+export type MediaInput = z.input<typeof mediaInputSchema>
+
+export type MediaActionResult =
+  | { ok: true; asset: MediaAsset }
+  | { ok: false; error: string }
+
+export async function adminListMediaAssets(): Promise<MediaAsset[]> {
+  await requireAdmin()
+  return db.select().from(mediaAssets).orderBy(desc(mediaAssets.createdAt))
+}
+
+export async function adminGetMediaStats() {
+  await requireAdmin()
+  const [assets, { usedUrls, usedAssetIds }] = await Promise.all([
+    db.select().from(mediaAssets),
+    getUsedAssetKeys(),
+  ])
+  const oneWeekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000
+  const used = assets.filter(
+    (a) => usedAssetIds.has(a.id) || usedUrls.has(a.url) || usedUrls.has(a.path),
+  )
+  return {
+    total: assets.length,
+    used: used.length,
+    unused: assets.length - used.length,
+    recent: assets.filter((a) => a.createdAt.getTime() > oneWeekAgo).length,
+  }
+}
+
+export async function adminCreateMediaAsset(input: MediaInput): Promise<MediaActionResult> {
+  await requireAdmin()
+  const parsed = mediaInputSchema.safeParse(input)
+  if (!parsed.success) {
+    return { ok: false, error: parsed.error.issues[0]?.message ?? 'Invalid input.' }
+  }
+  const data = parsed.data
+  const filename = filenameFromUrl(data.url)
+  try {
+    const [row] = await db
+      .insert(mediaAssets)
+      .values({
+        path: data.url,
+        name: data.title,
+        url: data.url,
+        title: data.title,
+        filename,
+        originalFilename: filename,
+        type: data.type,
+        category: data.category,
+        altText: data.altText,
+        caption: data.caption,
+        description: data.description,
+        tags: data.tags,
+        source: data.url.startsWith('/') ? 'local' : 'url',
+        storageProvider: detectProvider(data.url),
+        isPublic: data.isPublic,
+      })
+      .returning()
+    revalidateMedia()
+    return { ok: true, asset: row }
+  } catch {
+    return { ok: false, error: 'Save failed. An asset with this URL may already exist.' }
+  }
+}
+
+export async function adminUpdateMediaAsset(
+  id: number,
+  input: MediaInput,
+): Promise<MediaActionResult> {
+  await requireAdmin()
+  const parsed = mediaInputSchema.safeParse(input)
+  if (!parsed.success) {
+    return { ok: false, error: parsed.error.issues[0]?.message ?? 'Invalid input.' }
+  }
+  const data = parsed.data
+  try {
+    const [row] = await db
+      .update(mediaAssets)
+      .set({
+        path: data.url,
+        name: data.title,
+        url: data.url,
+        title: data.title,
+        filename: filenameFromUrl(data.url),
+        type: data.type,
+        category: data.category,
+        altText: data.altText,
+        caption: data.caption,
+        description: data.description,
+        tags: data.tags,
+        storageProvider: detectProvider(data.url),
+        isPublic: data.isPublic,
+        updatedAt: new Date(),
+      })
+      .where(eq(mediaAssets.id, id))
+      .returning()
+    revalidateMedia()
+    return { ok: true, asset: row }
+  } catch {
+    return { ok: false, error: 'Update failed. An asset with this URL may already exist.' }
+  }
+}
+
+export async function adminGetMediaAssetUsage(id: number): Promise<MediaUsage[]> {
+  await requireAdmin()
+  const [asset] = await db.select().from(mediaAssets).where(eq(mediaAssets.id, id)).limit(1)
+  if (!asset) return []
+  return getMediaUsage(asset)
+}
+
+export async function adminDeleteMediaAsset(
+  id: number,
+  options?: { force?: boolean },
+): Promise<{ ok: boolean; error?: string; usages?: MediaUsage[] }> {
+  await requireAdmin()
+  const [asset] = await db.select().from(mediaAssets).where(eq(mediaAssets.id, id)).limit(1)
+  if (!asset) return { ok: false, error: 'Asset not found.' }
+
+  const usages = await getMediaUsage(asset)
+  if (usages.length > 0 && !options?.force) {
+    return { ok: false, error: 'Asset is in use.', usages }
+  }
+
+  await db.delete(galleryItems).where(eq(galleryItems.mediaAssetId, id))
+  await db.delete(mediaAssets).where(eq(mediaAssets.id, id))
+  revalidateMedia()
+  return { ok: true }
+}
+
+/* ------------------------------------------------------------------ */
+/* Gallery collections                                                 */
+/* ------------------------------------------------------------------ */
+
+const collectionSchema = z.object({
+  slug: z.string().min(1, 'Slug is required.'),
+  title: z.string().min(1, 'Title is required.'),
+  description: z.string().default(''),
+  isPublished: z.boolean().default(true),
+  sortOrder: z.number().int().default(0),
+})
+
+export type CollectionInput = z.input<typeof collectionSchema>
+
+export async function adminListCollections(): Promise<GalleryCollection[]> {
+  await requireAdmin()
+  return db
+    .select()
+    .from(galleryCollections)
+    .orderBy(asc(galleryCollections.sortOrder), asc(galleryCollections.id))
+}
+
+export async function adminCreateCollection(
+  input: CollectionInput,
+): Promise<{ ok: boolean; error?: string }> {
+  await requireAdmin()
+  const parsed = collectionSchema.safeParse(input)
+  if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message }
+  try {
+    await db.insert(galleryCollections).values(parsed.data)
+    revalidateMedia()
+    return { ok: true }
+  } catch {
+    return { ok: false, error: 'Create failed. The slug may already exist.' }
+  }
+}
+
+export async function adminUpdateCollection(
+  id: number,
+  input: CollectionInput,
+): Promise<{ ok: boolean; error?: string }> {
+  await requireAdmin()
+  const parsed = collectionSchema.safeParse(input)
+  if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message }
+  try {
+    await db
+      .update(galleryCollections)
+      .set({ ...parsed.data, updatedAt: new Date() })
+      .where(eq(galleryCollections.id, id))
+    revalidateMedia()
+    return { ok: true }
+  } catch {
+    return { ok: false, error: 'Update failed. The slug may already exist.' }
+  }
+}
+
+export async function adminDeleteCollection(id: number) {
+  await requireAdmin()
+  await db.delete(galleryItems).where(eq(galleryItems.collectionId, id))
+  await db.delete(galleryCollections).where(eq(galleryCollections.id, id))
+  revalidateMedia()
+}
+
+/* ------------------------------------------------------------------ */
+/* Gallery items                                                       */
+/* ------------------------------------------------------------------ */
+
+export type GalleryItemWithAsset = GalleryItem & { asset: MediaAsset | null }
+
+export async function adminListGalleryItems(
+  collectionId: number,
+): Promise<GalleryItemWithAsset[]> {
+  await requireAdmin()
+  const items = await db
+    .select()
+    .from(galleryItems)
+    .where(eq(galleryItems.collectionId, collectionId))
+    .orderBy(asc(galleryItems.sortOrder), asc(galleryItems.id))
+  const assets = await db.select().from(mediaAssets)
+  const byId = new Map(assets.map((a) => [a.id, a]))
+  return items.map((item) => ({ ...item, asset: byId.get(item.mediaAssetId) ?? null }))
+}
+
+export async function adminAddGalleryItem(input: {
+  collectionId: number
+  mediaAssetId: number
+  title?: string
+  caption?: string
+  linkUrl?: string
+}) {
+  await requireAdmin()
+  const existing = await db
+    .select({ sortOrder: galleryItems.sortOrder })
+    .from(galleryItems)
+    .where(eq(galleryItems.collectionId, input.collectionId))
+  const nextOrder = existing.reduce((max, i) => Math.max(max, i.sortOrder), 0) + 1
+  await db.insert(galleryItems).values({
+    collectionId: input.collectionId,
+    mediaAssetId: input.mediaAssetId,
+    title: input.title ?? '',
+    caption: input.caption ?? '',
+    linkUrl: input.linkUrl ?? '',
+    sortOrder: nextOrder,
+  })
+  revalidateMedia()
+}
+
+export async function adminUpdateGalleryItem(
+  id: number,
+  input: Partial<{
+    title: string
+    caption: string
+    linkUrl: string
+    sortOrder: number
+    isVisible: boolean
+  }>,
+) {
+  await requireAdmin()
+  await db
+    .update(galleryItems)
+    .set({ ...input, updatedAt: new Date() })
+    .where(eq(galleryItems.id, id))
+  revalidateMedia()
+}
+
+export async function adminReorderGalleryItems(orderedIds: number[]) {
+  await requireAdmin()
+  await Promise.all(
+    orderedIds.map((id, index) =>
+      db
+        .update(galleryItems)
+        .set({ sortOrder: index + 1, updatedAt: new Date() })
+        .where(eq(galleryItems.id, id)),
+    ),
+  )
+  revalidateMedia()
+}
+
+export async function adminRemoveGalleryItem(id: number) {
+  await requireAdmin()
+  await db.delete(galleryItems).where(eq(galleryItems.id, id))
+  revalidateMedia()
+}

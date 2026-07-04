@@ -69,6 +69,14 @@ export interface SiteSettings {
   heroSubtitle: string
   heroCopy: string
   social: { label: string; href: string }[]
+  logoUrl: string
+  heroImage: string
+  ogImage: string
+  footerLogoUrl: string
+  faviconUrl: string
+  pageHeroBackground: string
+  labelSectionBackground: string
+  homeSectionBackground: string
 }
 
 // ---------------------------------------------------------------------------
@@ -91,6 +99,14 @@ export const siteSettings: SiteSettings = {
     { label: 'YouTube', href: '#' },
     { label: 'Instagram', href: '#' },
   ],
+  logoUrl: '/images/brand/brand-seal.webp',
+  heroImage: '/images/brand/hero-wide.webp',
+  ogImage: '/images/brand/hero-square.webp',
+  footerLogoUrl: '',
+  faviconUrl: '',
+  pageHeroBackground: '/images/brand/hero-wide.webp',
+  labelSectionBackground: '/images/visual/bronze-ember.png',
+  homeSectionBackground: '/images/visual/fire-ash.png',
 }
 
 // ---------------------------------------------------------------------------

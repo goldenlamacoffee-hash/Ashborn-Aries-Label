@@ -9,6 +9,12 @@ import {
   releases as releasesTable,
   tracks as tracksTable,
   siteSettings as settingsTable,
+  galleryCollections as collectionsTable,
+  galleryItems as itemsTable,
+  mediaAssets as mediaTable,
+  type GalleryCollection,
+  type GalleryItem,
+  type MediaAsset,
 } from './db/schema'
 import type {
   Artist,
@@ -172,6 +178,40 @@ export async function getTrack(
   const track = release.tracks.find((t) => t.slug === trackSlug)
   if (!track) return undefined
   return { release, track }
+}
+
+/* ---------------------------------------------------------------- gallery */
+
+export type PublicGalleryItem = GalleryItem & { asset: MediaAsset }
+export type PublicGalleryCollection = GalleryCollection & { items: PublicGalleryItem[] }
+
+export async function getPublishedGalleryCollections(): Promise<PublicGalleryCollection[]> {
+  const collections = await db
+    .select()
+    .from(collectionsTable)
+    .where(eq(collectionsTable.isPublished, true))
+    .orderBy(asc(collectionsTable.sortOrder), asc(collectionsTable.id))
+  if (collections.length === 0) return []
+
+  const [items, assets] = await Promise.all([
+    db
+      .select()
+      .from(itemsTable)
+      .where(eq(itemsTable.isVisible, true))
+      .orderBy(asc(itemsTable.sortOrder), asc(itemsTable.id)),
+    db.select().from(mediaTable),
+  ])
+  const assetById = new Map(assets.map((a) => [a.id, a]))
+
+  return collections.map((collection) => ({
+    ...collection,
+    items: items
+      .filter((item) => item.collectionId === collection.id)
+      .flatMap((item) => {
+        const asset = assetById.get(item.mediaAssetId)
+        return asset && asset.isPublic ? [{ ...item, asset }] : []
+      }),
+  }))
 }
 
 export async function filterReleasesAsync(filter: ReleaseFilter): Promise<Release[]> {

@@ -5,7 +5,7 @@ import { ReleaseCard } from '@/components/release-card'
 import { EmberButton } from '@/components/ember-button'
 import { StoryCard } from '@/components/story-card'
 import { NewsletterSignup } from '@/components/newsletter-signup'
-import { getReleases, getFeaturedRelease } from '@/lib/cms'
+import { getReleases, getFeaturedRelease, getSiteSettings } from '@/lib/cms'
 
 const storyPreviews = [
   {
@@ -26,8 +26,11 @@ const storyPreviews = [
 ]
 
 export default async function HomePage() {
-  const releases = await getReleases()
-  const featuredMaybe = await getFeaturedRelease()
+  const [releases, featuredMaybe, settings] = await Promise.all([
+    getReleases(),
+    getFeaturedRelease(),
+    getSiteSettings(),
+  ])
   if (!featuredMaybe) return null
   const featured = featuredMaybe
 
@@ -93,7 +96,7 @@ export default async function HomePage() {
         <div
           className="absolute inset-0 opacity-25"
           style={{
-            backgroundImage: 'url(/images/visual/fire-ash.png)',
+            backgroundImage: `url(${settings.homeSectionBackground || '/images/visual/fire-ash.png'})`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
           }}

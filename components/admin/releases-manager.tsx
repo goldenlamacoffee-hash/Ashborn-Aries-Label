@@ -10,6 +10,7 @@ import {
   type ReleaseInput,
 } from '@/app/actions/admin'
 import { AdminField, AdminTable, adminInputClass } from '@/components/admin/admin-ui'
+import { MediaPicker } from '@/components/admin/media-picker'
 import { cn } from '@/lib/utils'
 
 export type ReleaseRow = ReleaseInput & { id: number }
@@ -201,9 +202,13 @@ export function ReleasesManager({
             <AdminField label="Release Date" id="rel-date" hint="Free text, e.g. 2025">
               <input id="rel-date" className={adminInputClass} value={form.releaseDate} onChange={(e) => set('releaseDate', e.target.value)} />
             </AdminField>
-            <AdminField label="Cover Image Path" id="rel-cover" hint="e.g. /images/covers/ex-igne.webp">
-              <input id="rel-cover" className={adminInputClass} value={form.cover} onChange={(e) => set('cover', e.target.value)} />
-            </AdminField>
+            <MediaPicker
+              label="Cover Image"
+              value={form.cover}
+              onChange={(url) => set('cover', url)}
+              categoryHint="album-cover"
+              hint="Pick from the Media Library or clear and choose another."
+            />
             <AdminField label="Mood" id="rel-mood">
               <input id="rel-mood" className={adminInputClass} value={form.mood} onChange={(e) => set('mood', e.target.value)} />
             </AdminField>
