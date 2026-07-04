@@ -23,14 +23,17 @@ const lora = Lora({
 
 export async function generateMetadata(): Promise<Metadata> {
   let ogImage = '/images/brand/hero-square.webp'
+  let faviconUrl = ''
   try {
     const { getSiteSettings } = await import('@/lib/cms')
     const settings = await getSiteSettings()
     if (settings.ogImage) ogImage = settings.ogImage
+    if (settings.faviconUrl) faviconUrl = settings.faviconUrl
   } catch {
     // fall back to the default OG image if the database is unavailable
   }
   return {
+    ...(faviconUrl ? { icons: { icon: faviconUrl } } : {}),
     title: {
       default: 'Ashborn Aries Label — From Fire and Pain',
       template: '%s — Ashborn Aries Label',

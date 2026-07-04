@@ -87,9 +87,17 @@ export function MediaPicker({
             {selected?.title || (value ? value : 'No image selected')}
           </p>
           {value && (
-            <div className="mt-1 flex items-center gap-2">
+            <div className="mt-1 flex flex-wrap items-center gap-2">
               <CopyButton value={value} label="Copy URL" />
               {selected && <CopyButton value={String(selected.id)} label="ID" />}
+              <a
+                href={selected ? `/admin/media?asset=${selected.id}` : '/admin/media'}
+                target="_blank"
+                rel="noreferrer"
+                className="border border-border px-2 py-0.5 text-[10px] uppercase tracking-widest text-muted-foreground hover:text-foreground"
+              >
+                Library
+              </a>
             </div>
           )}
         </div>

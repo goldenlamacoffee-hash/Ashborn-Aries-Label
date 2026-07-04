@@ -21,7 +21,11 @@ export async function generateMetadata({
   const { slug } = await params
   const artist = await getArtistBySlug(slug)
   if (!artist) return {}
-  return { title: artist.name, description: artist.tagline }
+  return {
+    title: artist.name,
+    description: artist.tagline,
+    ...(artist.image ? { openGraph: { images: [{ url: artist.image }] } } : {}),
+  }
 }
 
 export default async function ArtistDetailPage({

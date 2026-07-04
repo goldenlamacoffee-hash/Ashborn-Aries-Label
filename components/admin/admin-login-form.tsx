@@ -5,9 +5,9 @@ import { useRouter } from 'next/navigation'
 import { authClient } from '@/lib/auth-client'
 import { EmberButton } from '@/components/ember-button'
 
-export function AdminLoginForm() {
+export function AdminLoginForm({ allowSignUp = false }: { allowSignUp?: boolean }) {
   const router = useRouter()
-  const [mode, setMode] = useState<'sign-in' | 'sign-up'>('sign-in')
+  const [mode, setMode] = useState<'sign-in' | 'sign-up'>(allowSignUp ? 'sign-up' : 'sign-in')
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -94,16 +94,18 @@ export function AdminLoginForm() {
       <EmberButton type="submit" className="mt-2 h-11 w-full">
         {loading ? 'Working…' : mode === 'sign-in' ? 'Sign In' : 'Create Account'}
       </EmberButton>
-      <button
-        type="button"
-        onClick={() => {
-          setMode(mode === 'sign-in' ? 'sign-up' : 'sign-in')
-          setError(null)
-        }}
-        className="font-sans text-xs text-muted-foreground underline-offset-4 hover:text-gold hover:underline"
-      >
-        {mode === 'sign-in' ? 'First time? Create the admin account' : 'Back to sign in'}
-      </button>
+      {allowSignUp && (
+        <button
+          type="button"
+          onClick={() => {
+            setMode(mode === 'sign-in' ? 'sign-up' : 'sign-in')
+            setError(null)
+          }}
+          className="font-sans text-xs text-muted-foreground underline-offset-4 hover:text-gold hover:underline"
+        >
+          {mode === 'sign-in' ? 'First time? Create the admin account' : 'Back to sign in'}
+        </button>
+      )}
     </form>
   )
 }
