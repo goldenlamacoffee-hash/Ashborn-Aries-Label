@@ -15,9 +15,9 @@ export function PageHero({
       <div
         className="absolute inset-0 opacity-40"
         style={{
-          backgroundImage: 'url(/images/hero-bg.png)',
+          backgroundImage: 'url(/images/brand/hero-wide.webp)',
           backgroundSize: 'cover',
-          backgroundPosition: 'center',
+          backgroundPosition: 'center 22%',
         }}
         aria-hidden="true"
       />

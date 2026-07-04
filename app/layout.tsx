@@ -1,7 +1,13 @@
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
-import { Cinzel, Montserrat } from 'next/font/google'
+import { Cinzel, Lora, Playfair_Display } from 'next/font/google'
 import './globals.css'
+
+const playfair = Playfair_Display({
+  subsets: ['latin'],
+  variable: '--font-playfair',
+  weight: ['400', '500', '600', '700', '800'],
+})
 
 const cinzel = Cinzel({
   subsets: ['latin'],
@@ -9,10 +15,10 @@ const cinzel = Cinzel({
   weight: ['400', '500', '600', '700', '800'],
 })
 
-const montserrat = Montserrat({
+const lora = Lora({
   subsets: ['latin'],
-  variable: '--font-montserrat',
-  weight: ['300', '400', '500', '600'],
+  variable: '--font-lora',
+  weight: ['400', '500', '600'],
 })
 
 export const metadata: Metadata = {
@@ -29,7 +35,7 @@ export const metadata: Metadata = {
       'Dark country, Southern gothic, cinematic western, sax lounge, and emotional music forged from fire, ash, pain, discipline, and rebirth.',
     url: 'https://ashbornaries.music',
     siteName: 'Ashborn Aries Label',
-    images: [{ url: '/images/ram-emblem.png', width: 1024, height: 1024 }],
+    images: [{ url: '/images/brand/hero-square.webp', width: 1200, height: 1200 }],
     type: 'website',
   },
   generator: 'v0.app',
@@ -46,7 +52,10 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={`bg-background ${cinzel.variable} ${montserrat.variable}`}>
+    <html
+      lang="en"
+      className={`bg-background ${playfair.variable} ${cinzel.variable} ${lora.variable}`}
+    >
       <body className="antialiased">
         {children}
         {process.env.NODE_ENV === 'production' && <Analytics />}

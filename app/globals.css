@@ -5,8 +5,11 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --font-serif: var(--font-cinzel), serif;
-  --font-sans: var(--font-montserrat), sans-serif;
+  /* Website typography per brand manual p.04:
+     headings Playfair Display, subheadings Cinzel, body Lora */
+  --font-serif: var(--font-playfair), serif;
+  --font-display: var(--font-cinzel), serif;
+  --font-sans: var(--font-lora), serif;
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);
@@ -48,11 +51,11 @@
   --ash: #4b4b4d;
 
   --background: #0b0b0b;
-  --foreground: #e6ddce;
+  --foreground: #dcccb3;
   --card: #131211;
-  --card-foreground: #e6ddce;
+  --card-foreground: #dcccb3;
   --popover: #131211;
-  --popover-foreground: #e6ddce;
+  --popover-foreground: #dcccb3;
   --primary: #c9a46a;
   --primary-foreground: #0b0b0b;
   --secondary: #1c1a16;
@@ -62,8 +65,8 @@
   --accent: #ff5a1f;
   --accent-foreground: #0b0b0b;
   --destructive: #b3402a;
-  --border: rgba(122, 90, 46, 0.35);
-  --input: rgba(122, 90, 46, 0.4);
+  --border: rgba(201, 164, 106, 0.35);
+  --input: rgba(201, 164, 106, 0.4);
   --ring: #c9a46a;
   --radius: 0.25rem;
 }
@@ -77,6 +80,12 @@
   }
   body {
     @apply bg-background text-foreground font-sans;
+    background-image: radial-gradient(
+      circle at 50% 0%,
+      rgba(139, 62, 31, 0.22),
+      transparent 42%
+    );
+    background-repeat: no-repeat;
   }
   h1,
   h2,

@@ -2,8 +2,10 @@ import Image from "next/image"
 import { AdminPageHeader } from "@/components/admin/admin-ui"
 
 const assets = [
-  { src: "/images/ram-emblem.png", name: "Ram emblem", usage: "Logo, header, OG image" },
-  { src: "/images/hero-bg.png", name: "Hero background", usage: "Homepage hero" },
+  { src: "/images/brand/brand-seal.webp", name: "Brand seal", usage: "Logo, header, footer" },
+  { src: "/images/brand/ram-emblem-large.webp", name: "Ram emblem (large)", usage: "Feature artwork" },
+  { src: "/images/brand/hero-wide.webp", name: "Hero artwork (wide)", usage: "Homepage & page heroes" },
+  { src: "/images/brand/hero-square.webp", name: "Hero artwork (square)", usage: "OG image, social" },
   { src: "/images/covers/ex-igne-et-dolore.png", name: "Ex Igne et Dolore", usage: "Album cover" },
   { src: "/images/covers/black-ink-salvation.png", name: "Black Ink Salvation", usage: "Album cover" },
   { src: "/images/covers/still-standing-in-the-fire.png", name: "Still Standing in the Fire", usage: "Single cover" },

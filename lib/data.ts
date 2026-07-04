@@ -79,10 +79,10 @@ export const siteSettings: SiteSettings = {
   siteName: 'Ashborn Aries Label',
   domain: 'ashbornaries.music',
   tagline: 'From fire and pain.',
-  footerLine: 'Real music. Dark roots. No apologies.',
+  footerLine: 'Dark Country. Real Stories. No Compromise.',
   contactEmail: 'contact@ashbornaries.music',
-  heroHeadline: 'ASHBORN ARIES LABEL',
-  heroSubtitle: 'From fire and pain.',
+  heroHeadline: 'Real Music. Rooted in Truth.',
+  heroSubtitle: 'Dark country. Real stories. No compromise.',
   heroCopy:
     'Dark country. Southern gothic. Outlaw soul. Music forged in ash, discipline, and truth.',
   social: [
@@ -177,7 +177,7 @@ export const releases: Release[] = [
     releaseDate: '2025',
     mood: 'Dark country · concept album',
     description:
-      'A dark country concept album about fire, pain, discipline, love, scars, and rebirth. A man walking through hell and coming back with fire in his chest.',
+      'A dark country concept album forged from pain, discipline, love, scars, and rebirth.',
     story:
       'Ex Igne et Dolore — “from fire and pain” — is the record the label was founded on. Nine chapters of one story: the burn, the wound, the long black road, and the slow return. It is not written to comfort. It is written to stand.',
     coverImage: '/images/covers/ex-igne-et-dolore.png',
@@ -267,7 +267,7 @@ export const releases: Release[] = [
     releaseDate: '2025',
     mood: 'Dark country · tattoos & redemption',
     description:
-      'Songs about tattoos, marks, and the stories carved into skin — salvation written in black ink.',
+      'Internal demons, tattoos, patience, strength, and the discipline to keep rising.',
     story:
       'Black Ink Salvation treats the body as a record: every mark a verse, every scar a chorus. A darker, closer companion to Ex Igne et Dolore.',
     coverImage: '/images/covers/black-ink-salvation.png',
@@ -335,7 +335,7 @@ export const releases: Release[] = [
     releaseDate: '2025',
     mood: 'Dark country · anthem',
     description:
-      'The standalone single cut of the album anthem — refusing to fall while everything burns.',
+      'A wounded but unbroken anthem about love, growth, and choosing yourself.',
     coverImage: '/images/covers/still-standing-in-the-fire.png',
     tags: ['dark country'],
     streaming: { spotify: '#', appleMusic: '#', youtube: '#' },
