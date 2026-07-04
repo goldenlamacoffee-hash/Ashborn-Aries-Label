@@ -11,9 +11,11 @@ import {
   type MediaAsset,
 } from '@/lib/db/schema'
 import {
+  blobConfigured,
   detectProvider,
   filenameFromUrl,
   isValidAssetUrl,
+  uploadFile,
 } from '@/lib/media/storage'
 import { getMediaUsage, getUsedAssetKeys, type MediaUsage } from '@/lib/media/get-media-usage'
 import { asc, desc, eq } from 'drizzle-orm'
@@ -85,6 +87,126 @@ export async function adminGetMediaStats() {
     used: used.length,
     unused: assets.length - used.length,
     recent: assets.filter((a) => a.createdAt.getTime() > oneWeekAgo).length,
+  }
+}
+
+const ALLOWED_UPLOAD_TYPES = new Set([
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+  'image/gif',
+  'image/svg+xml',
+  'image/avif',
+])
+const MAX_UPLOAD_BYTES = 10 * 1024 * 1024 // 10 MB
+
+export type UploadResult =
+  | { ok: true; asset: MediaAsset }
+  | { ok: false; error: string }
+
+/** Whether direct file upload is available (Blob storage configured). */
+export async function adminUploadAvailable(): Promise<boolean> {
+  await requireAdmin()
+  return blobConfigured()
+}
+
+/**
+ * Upload an image file to Blob storage and register it in the media library.
+ * Expects FormData with: file, title, altText, caption, description,
+ * category, tags (comma separated), width, height (optional, from client).
+ */
+export async function adminUploadMediaAsset(formData: FormData): Promise<UploadResult> {
+  await requireAdmin()
+
+  const file = formData.get('file')
+  if (!(file instanceof File) || file.size === 0) {
+    return { ok: false, error: 'No file provided.' }
+  }
+  if (!ALLOWED_UPLOAD_TYPES.has(file.type)) {
+    return { ok: false, error: 'Unsupported file type. Use JPEG, PNG, WebP, GIF, SVG, or AVIF.' }
+  }
+  if (file.size > MAX_UPLOAD_BYTES) {
+    return { ok: false, error: 'File is too large. Maximum size is 10 MB.' }
+  }
+
+  const meta = z
+    .object({
+      title: z.string().min(1, 'Title is required.'),
+      altText: z.string().default(''),
+      caption: z.string().default(''),
+      description: z.string().default(''),
+      category: z.string().min(1, 'Category is required.'),
+      tags: z.string().default(''),
+      width: z.coerce.number().int().positive().optional(),
+      height: z.coerce.number().int().positive().optional(),
+    })
+    .safeParse({
+      title: formData.get('title') ?? '',
+      altText: formData.get('altText') ?? '',
+      caption: formData.get('caption') ?? '',
+      description: formData.get('description') ?? '',
+      category: formData.get('category') ?? '',
+      tags: formData.get('tags') ?? '',
+      width: formData.get('width') || undefined,
+      height: formData.get('height') || undefined,
+    })
+  if (!meta.success) {
+    return { ok: false, error: meta.error.issues[0]?.message ?? 'Invalid input.' }
+  }
+  const data = meta.data
+  if (!data.altText.trim()) {
+    return { ok: false, error: 'Alt text is required for uploaded images.' }
+  }
+
+  let stored
+  try {
+    stored = await uploadFile(file)
+  } catch (err) {
+    return {
+      ok: false,
+      error: err instanceof Error ? err.message : 'Upload failed. Please try again.',
+    }
+  }
+
+  try {
+    const [row] = await db
+      .insert(mediaAssets)
+      .values({
+        path: stored.url,
+        name: data.title,
+        url: stored.url,
+        title: data.title,
+        filename: filenameFromUrl(stored.url),
+        originalFilename: file.name,
+        type: 'image',
+        mimeType: file.type,
+        category: data.category,
+        altText: data.altText,
+        caption: data.caption,
+        description: data.description,
+        tags: data.tags
+          .split(',')
+          .map((t) => t.trim())
+          .filter(Boolean),
+        width: data.width ?? null,
+        height: data.height ?? null,
+        fileSize: file.size,
+        source: 'upload',
+        storageProvider: 'blob',
+        isPublic: true,
+      })
+      .returning()
+    revalidateMedia()
+    return { ok: true, asset: row }
+  } catch {
+    // Registration failed after the file was stored — clean up the blob.
+    try {
+      const { del } = await import('@vercel/blob')
+      await del(stored.url)
+    } catch {
+      // best-effort cleanup
+    }
+    return { ok: false, error: 'Save failed. An asset with this URL may already exist.' }
   }
 }
 
@@ -184,6 +306,17 @@ export async function adminDeleteMediaAsset(
 
   await db.delete(galleryItems).where(eq(galleryItems.mediaAssetId, id))
   await db.delete(mediaAssets).where(eq(mediaAssets.id, id))
+
+  // Remove the underlying file from Blob storage when we own it.
+  if (asset.storageProvider === 'blob' && blobConfigured()) {
+    try {
+      const { del } = await import('@vercel/blob')
+      await del(asset.url)
+    } catch {
+      // best-effort cleanup; the DB record is already gone
+    }
+  }
+
   revalidateMedia()
   return { ok: true }
 }

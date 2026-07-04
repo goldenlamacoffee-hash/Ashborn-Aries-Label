@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { adminListMediaAssets } from '@/app/actions/media'
 import type { MediaAsset } from '@/lib/db/schema'
 import { CopyButton } from '@/components/admin/copy-button'
+import { MediaUploadForm } from '@/components/admin/media-upload-form'
 import { MEDIA_CATEGORIES, labelize } from '@/lib/media/constants'
 import { cn } from '@/lib/utils'
 
@@ -31,6 +32,7 @@ export function MediaPicker({
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState(categoryHint ?? 'all')
   const [loading, setLoading] = useState(false)
+  const [uploadMode, setUploadMode] = useState(false)
 
   useEffect(() => {
     if (!open || assets !== null) return
@@ -123,7 +125,31 @@ export function MediaPicker({
       {hint && <p className="text-[11px] text-muted-foreground">{hint}</p>}
 
       {/* Picker panel */}
-      {open && (
+      {open && uploadMode && (
+        <div className="mt-1 border border-bronze/60 bg-card p-4">
+          <div className="mb-4 flex items-center justify-between">
+            <h4 className="font-serif text-base text-foreground">Upload New Image</h4>
+            <button
+              type="button"
+              onClick={() => setUploadMode(false)}
+              className="text-[10px] uppercase tracking-widest text-muted-foreground hover:text-foreground"
+            >
+              Back to library
+            </button>
+          </div>
+          <MediaUploadForm
+            defaultCategory={categoryHint}
+            onDone={(asset) => {
+              setAssets(null) // refetch on next open
+              setUploadMode(false)
+              setOpen(false)
+              onChange(asset.url, asset)
+            }}
+            onCancel={() => setUploadMode(false)}
+          />
+        </div>
+      )}
+      {open && !uploadMode && (
         <div className="mt-1 flex max-h-[420px] flex-col gap-3 overflow-hidden border border-bronze/60 bg-card p-3">
           <div className="flex flex-wrap items-center gap-2">
             <input
@@ -147,6 +173,13 @@ export function MediaPicker({
                 </option>
               ))}
             </select>
+            <button
+              type="button"
+              onClick={() => setUploadMode(true)}
+              className="border border-bronze px-3 py-1.5 text-[10px] uppercase tracking-widest text-gold hover:border-gold"
+            >
+              Upload New
+            </button>
           </div>
 
           <div className="min-h-0 flex-1 overflow-y-auto">
@@ -217,6 +250,7 @@ export function MediaAssetPickerDialog({
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState('all')
   const [loading, setLoading] = useState(false)
+  const [uploadMode, setUploadMode] = useState(false)
 
   useEffect(() => {
     if (!open || assets !== null) return
@@ -254,15 +288,49 @@ export function MediaAssetPickerDialog({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between gap-3">
-          <h3 className="font-serif text-lg text-foreground">Choose from Media Library</h3>
-          <button
-            type="button"
-            onClick={onClose}
-            className="border border-border px-3 py-1.5 text-[10px] uppercase tracking-widest text-muted-foreground hover:text-foreground"
-          >
-            Close
-          </button>
+          <h3 className="font-serif text-lg text-foreground">
+            {uploadMode ? 'Upload New Image' : 'Choose from Media Library'}
+          </h3>
+          <div className="flex items-center gap-2">
+            {uploadMode ? (
+              <button
+                type="button"
+                onClick={() => setUploadMode(false)}
+                className="border border-border px-3 py-1.5 text-[10px] uppercase tracking-widest text-muted-foreground hover:text-foreground"
+              >
+                Back to library
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setUploadMode(true)}
+                className="border border-bronze px-3 py-1.5 text-[10px] uppercase tracking-widest text-gold hover:border-gold"
+              >
+                Upload New
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={onClose}
+              className="border border-border px-3 py-1.5 text-[10px] uppercase tracking-widest text-muted-foreground hover:text-foreground"
+            >
+              Close
+            </button>
+          </div>
         </div>
+        {uploadMode ? (
+          <div className="min-h-0 flex-1 overflow-y-auto">
+            <MediaUploadForm
+              onDone={(asset) => {
+                setAssets(null) // refetch on next open
+                setUploadMode(false)
+                onSelect(asset)
+              }}
+              onCancel={() => setUploadMode(false)}
+            />
+          </div>
+        ) : (
+          <>
         <div className="flex flex-wrap items-center gap-2">
           <input
             type="search"
@@ -324,6 +392,8 @@ export function MediaAssetPickerDialog({
             </div>
           )}
         </div>
+          </>
+        )}
       </div>
     </div>
   )
