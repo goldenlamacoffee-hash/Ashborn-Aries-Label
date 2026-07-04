@@ -6,6 +6,7 @@ import Image from 'next/image'
 import type { MediaAsset } from '@/lib/db/schema'
 import { MediaAssetCard } from '@/components/admin/media-asset-card'
 import { MediaAssetForm } from '@/components/admin/media-asset-form'
+import { MediaUploadForm } from '@/components/admin/media-upload-form'
 import { CopyButton } from '@/components/admin/copy-button'
 import { AdminTable } from '@/components/admin/admin-ui'
 import { MEDIA_CATEGORIES, MEDIA_TYPES, labelize } from '@/lib/media/constants'
@@ -32,6 +33,7 @@ export function MediaLibraryGrid({
   const [usage, setUsage] = useState<'all' | 'used' | 'unused'>('all')
   const [editing, setEditing] = useState<MediaAsset | null>(null)
   const [adding, setAdding] = useState(false)
+  const [uploading, setUploading] = useState(false)
 
   const usedUrlSet = useMemo(() => new Set(usedUrls), [usedUrls])
   const usedIdSet = useMemo(() => new Set(usedAssetIds), [usedAssetIds])
@@ -58,10 +60,11 @@ export function MediaLibraryGrid({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [assets, search, category, type, usage, usedUrlSet, usedIdSet])
 
-  const showingForm = adding || editing !== null
+  const showingForm = adding || uploading || editing !== null
 
   function closeForm() {
     setAdding(false)
+    setUploading(false)
     setEditing(null)
     router.refresh()
   }
@@ -91,23 +94,24 @@ export function MediaLibraryGrid({
           <button
             type="button"
             onClick={() => {
-              setAdding(true)
+              setUploading(true)
+              setAdding(false)
               setEditing(null)
             }}
             className="border border-primary bg-primary px-5 py-2.5 text-xs font-semibold uppercase tracking-widest text-primary-foreground transition-all hover:-translate-y-0.5"
           >
-            Add Media
+            Upload Image
           </button>
           <button
             type="button"
             onClick={() => {
               setAdding(true)
+              setUploading(false)
               setEditing(null)
             }}
-            title="Direct file upload activates with Blob storage. Until then this opens Add by URL."
             className="border border-bronze px-5 py-2.5 text-xs uppercase tracking-widest text-gold transition-all hover:-translate-y-0.5 hover:border-gold"
           >
-            Upload Image
+            Add by URL
           </button>
           <div className="ml-auto flex items-center border border-border">
             <button
@@ -187,9 +191,17 @@ export function MediaLibraryGrid({
       {showingForm && (
         <div className="border border-bronze/60 bg-card p-6">
           <h2 className="mb-5 font-serif text-xl text-foreground">
-            {editing ? `Editing: ${editing.title || editing.name}` : 'Add Media'}
+            {editing
+              ? `Editing: ${editing.title || editing.name}`
+              : uploading
+                ? 'Upload Image'
+                : 'Add Media by URL'}
           </h2>
-          <MediaAssetForm asset={editing} onDone={closeForm} onCancel={() => { setAdding(false); setEditing(null) }} />
+          {uploading ? (
+            <MediaUploadForm onDone={closeForm} onCancel={() => setUploading(false)} />
+          ) : (
+            <MediaAssetForm asset={editing} onDone={closeForm} onCancel={() => { setAdding(false); setEditing(null) }} />
+          )}
         </div>
       )}
 
