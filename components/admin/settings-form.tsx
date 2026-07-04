@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { adminSetSetting } from '@/app/actions/admin'
 import { AdminField, adminInputClass } from '@/components/admin/admin-ui'
+import { MediaPicker } from '@/components/admin/media-picker'
 import type { SiteSettings } from '@/lib/data'
 
 export function SettingsForm({ initial }: { initial: SiteSettings }) {
@@ -63,6 +64,33 @@ export function SettingsForm({ initial }: { initial: SiteSettings }) {
               onChange={(e) => update({ heroCopy: e.target.value })}
             />
           </AdminField>
+        </div>
+      </section>
+
+      <section className="border border-border bg-card p-6">
+        <h2 className="font-serif text-xl text-foreground">Branding & media</h2>
+        <div className="mt-6 flex flex-col gap-6">
+          <MediaPicker
+            label="Main logo / brand seal"
+            value={settings.logoUrl}
+            onChange={(url) => update({ logoUrl: url })}
+            categoryHint="logo"
+            hint="Used in the site header, footer, and admin."
+          />
+          <MediaPicker
+            label="Homepage hero image"
+            value={settings.heroImage}
+            onChange={(url) => update({ heroImage: url })}
+            categoryHint="hero-background"
+            hint="Full-width artwork behind the homepage hero."
+          />
+          <MediaPicker
+            label="Default OG / social share image"
+            value={settings.ogImage}
+            onChange={(url) => update({ ogImage: url })}
+            categoryHint="seo-og"
+            hint="Shown when pages are shared on social platforms."
+          />
         </div>
       </section>
 

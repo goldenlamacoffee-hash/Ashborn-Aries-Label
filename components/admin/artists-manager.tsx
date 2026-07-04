@@ -10,6 +10,7 @@ import {
   type ArtistInput,
 } from '@/app/actions/admin'
 import { AdminField, AdminTable, adminInputClass } from '@/components/admin/admin-ui'
+import { MediaPicker } from '@/components/admin/media-picker'
 
 export type ArtistRow = ArtistInput & { id: number }
 
@@ -153,9 +154,13 @@ export function ArtistsManager({ artists }: { artists: ArtistRow[] }) {
             <AdminField label="Role" id="art-role" hint="e.g. Founder. Voice of the fire.">
               <input id="art-role" className={adminInputClass} value={form.role} onChange={(e) => set('role', e.target.value)} />
             </AdminField>
-            <AdminField label="Photo Path" id="art-image" hint="e.g. /images/artists/ashborn.webp">
-              <input id="art-image" className={adminInputClass} value={form.image} onChange={(e) => set('image', e.target.value)} />
-            </AdminField>
+            <MediaPicker
+              label="Artist Image"
+              value={form.image}
+              onChange={(url) => set('image', url)}
+              categoryHint="artist-image"
+              hint="Pick from the Media Library."
+            />
           </div>
           <AdminField label="Tagline" id="art-tagline">
             <input id="art-tagline" className={adminInputClass} value={form.tagline} onChange={(e) => set('tagline', e.target.value)} />

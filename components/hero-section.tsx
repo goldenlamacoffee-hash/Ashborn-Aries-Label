@@ -10,7 +10,7 @@ export async function HeroSection() {
       {/* Official brand artwork */}
       <div className="absolute inset-0">
         <Image
-          src="/images/brand/hero-wide.webp"
+          src={siteSettings.heroImage || '/images/brand/hero-wide.webp'}
           alt=""
           fill
           priority
@@ -18,7 +18,7 @@ export async function HeroSection() {
           className="hidden object-cover object-top opacity-90 sm:block"
         />
         <Image
-          src="/images/brand/hero-square.webp"
+          src={siteSettings.ogImage || '/images/brand/hero-square.webp'}
           alt=""
           fill
           priority

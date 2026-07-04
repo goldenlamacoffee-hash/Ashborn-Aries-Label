@@ -69,6 +69,9 @@ export interface SiteSettings {
   heroSubtitle: string
   heroCopy: string
   social: { label: string; href: string }[]
+  logoUrl: string
+  heroImage: string
+  ogImage: string
 }
 
 // ---------------------------------------------------------------------------
@@ -91,6 +94,9 @@ export const siteSettings: SiteSettings = {
     { label: 'YouTube', href: '#' },
     { label: 'Instagram', href: '#' },
   ],
+  logoUrl: '/images/brand/brand-seal.webp',
+  heroImage: '/images/brand/hero-wide.webp',
+  ogImage: '/images/brand/hero-square.webp',
 }
 
 // ---------------------------------------------------------------------------

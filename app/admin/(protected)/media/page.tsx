@@ -1,53 +1,29 @@
-import Image from "next/image"
-import { AdminPageHeader } from "@/components/admin/admin-ui"
+import { AdminPageHeader } from '@/components/admin/admin-ui'
+import { MediaLibraryGrid } from '@/components/admin/media-library-grid'
+import { adminGetMediaStats, adminListMediaAssets } from '@/app/actions/media'
+import { getUsedAssetKeys } from '@/lib/media/get-media-usage'
 
-const assets = [
-  { src: "/images/brand/brand-seal.webp", name: "Brand seal", usage: "Logo, header, footer" },
-  { src: "/images/brand/ram-emblem-large.webp", name: "Ram emblem (large)", usage: "Feature artwork" },
-  { src: "/images/brand/hero-wide.webp", name: "Hero artwork (wide)", usage: "Homepage & page heroes" },
-  { src: "/images/brand/hero-square.webp", name: "Hero artwork (square)", usage: "OG image, social" },
-  { src: "/images/covers/ex-igne-et-dolore.png", name: "Ex Igne et Dolore", usage: "Album cover" },
-  { src: "/images/covers/black-ink-salvation.png", name: "Black Ink Salvation", usage: "Album cover" },
-  { src: "/images/covers/still-standing-in-the-fire.png", name: "Still Standing in the Fire", usage: "Single cover" },
-  { src: "/images/covers/afterglow-sax.png", name: "Afterglow", usage: "Sax album cover" },
-  { src: "/images/covers/velvet-rain-sax.png", name: "Velvet Rain", usage: "Sax album cover" },
-  { src: "/images/covers/morning-glow-sax.png", name: "Morning Glow", usage: "Sax album cover" },
-  { src: "/images/artists/ashborn-aries.png", name: "Ashborn Aries", usage: "Artist visual" },
-  { src: "/images/artists/golden-lama-sax.png", name: "Golden Lama Sax", usage: "Artist visual" },
-  { src: "/images/artists/ashborn-instrumentals.png", name: "Ashborn Instrumentals", usage: "Artist visual" },
-  { src: "/images/visual/fire-ash.png", name: "Fire & Ash", usage: "Visual World" },
-  { src: "/images/visual/black-road.png", name: "The Black Road", usage: "Visual World" },
-  { src: "/images/visual/tattoo-marks.png", name: "Ink & Marks", usage: "Visual World" },
-  { src: "/images/visual/bronze-ember.png", name: "Bronze & Ember", usage: "Visual World" },
-]
+export const dynamic = 'force-dynamic'
 
-export default function AdminMediaPage() {
+export default async function AdminMediaPage() {
+  const [assets, stats, usedKeys] = await Promise.all([
+    adminListMediaAssets(),
+    adminGetMediaStats(),
+    getUsedAssetKeys(),
+  ])
+
   return (
     <>
       <AdminPageHeader
-        title="Media / Gallery"
-        description="All visual assets currently in use across the site. Upload and replace support arrives with Blob storage."
+        title="Media Library"
+        description="Every visual asset on the site. Add by URL, edit metadata, copy public links, and reuse assets across releases, artists, galleries, and settings."
       />
-
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-        {assets.map((a) => (
-          <figure key={a.src} className="border border-border bg-card">
-            <div className="relative aspect-square">
-              <Image
-                src={a.src || "/placeholder.svg"}
-                alt={a.name}
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 50vw, 25vw"
-              />
-            </div>
-            <figcaption className="p-3">
-              <p className="text-sm text-foreground">{a.name}</p>
-              <p className="mt-1 text-xs text-muted-foreground">{a.usage}</p>
-            </figcaption>
-          </figure>
-        ))}
-      </div>
+      <MediaLibraryGrid
+        assets={assets}
+        stats={stats}
+        usedUrls={[...usedKeys.usedUrls]}
+        usedAssetIds={[...usedKeys.usedAssetIds]}
+      />
     </>
   )
 }

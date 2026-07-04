@@ -159,7 +159,50 @@ export const mediaAssets = pgTable('media_assets', {
   path: text('path').notNull().unique(),
   name: text('name').notNull(),
   usage: text('usage').notNull().default(''),
+  url: text('url').notNull().default(''),
+  title: text('title').notNull().default(''),
+  filename: text('filename').notNull().default(''),
+  originalFilename: text('original_filename').notNull().default(''),
+  type: text('type').notNull().default('image'),
+  mimeType: text('mime_type').notNull().default(''),
+  category: text('category').notNull().default('other'),
+  altText: text('alt_text').notNull().default(''),
+  caption: text('caption').notNull().default(''),
+  description: text('description').notNull().default(''),
+  tags: jsonb('tags').$type<string[]>().notNull().default([]),
+  width: integer('width'),
+  height: integer('height'),
+  fileSize: integer('file_size'),
+  source: text('source').notNull().default('local'),
+  storageProvider: text('storage_provider').notNull().default('public'),
+  blurDataUrl: text('blur_data_url'),
+  isPublic: boolean('is_public').notNull().default(true),
   createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
+
+export const galleryCollections = pgTable('gallery_collections', {
+  id: serial('id').primaryKey(),
+  slug: text('slug').notNull().unique(),
+  title: text('title').notNull(),
+  description: text('description').notNull().default(''),
+  isPublished: boolean('is_published').notNull().default(true),
+  sortOrder: integer('sort_order').notNull().default(0),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
+
+export const galleryItems = pgTable('gallery_items', {
+  id: serial('id').primaryKey(),
+  collectionId: integer('collection_id').notNull(),
+  mediaAssetId: integer('media_asset_id').notNull(),
+  title: text('title').notNull().default(''),
+  caption: text('caption').notNull().default(''),
+  linkUrl: text('link_url').notNull().default(''),
+  sortOrder: integer('sort_order').notNull().default(0),
+  isVisible: boolean('is_visible').notNull().default(true),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
 })
 
 /* Inferred types */
@@ -169,3 +212,5 @@ export type Track = typeof tracks.$inferSelect
 export type ContactMessage = typeof contactMessages.$inferSelect
 export type NewsletterSubscriber = typeof newsletterSubscribers.$inferSelect
 export type MediaAsset = typeof mediaAssets.$inferSelect
+export type GalleryCollection = typeof galleryCollections.$inferSelect
+export type GalleryItem = typeof galleryItems.$inferSelect
