@@ -49,7 +49,7 @@ export function LyricsArchive({ albums }: { albums: Release[] }) {
             className="h-12 w-full rounded-sm border border-bronze/50 bg-background pl-11 pr-4 font-sans text-sm text-foreground placeholder:text-muted-foreground focus:border-gold focus:outline-none"
           />
         </div>
-        <div className="flex flex-wrap justify-center gap-2" role="group" aria-label="Select album">
+        <div className="flex flex-wrap justify-center gap-2" role="group" aria-label="Select release">
           <button
             type="button"
             onClick={() => setSelectedAlbum('all')}
@@ -61,7 +61,7 @@ export function LyricsArchive({ albums }: { albums: Release[] }) {
                 : 'border-bronze/40 text-muted-foreground hover:border-gold/60 hover:text-gold',
             )}
           >
-            All Albums
+            All Releases
           </button>
           {albums.map((album) => (
             <button

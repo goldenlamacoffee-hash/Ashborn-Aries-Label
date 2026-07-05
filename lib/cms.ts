@@ -166,7 +166,11 @@ export async function getArtistBySlug(slug: string): Promise<Artist | undefined>
 
 export async function getLyricAlbums(): Promise<Release[]> {
   const list = await loadReleases()
-  return list.filter((r) => r.type === 'album')
+  // Include every published release (album, single, EP, instrumental, etc.)
+  // that has at least one published track. loadReleases() already filters to
+  // published releases with only published tracks attached, so we just drop
+  // releases with no lyric/track content.
+  return list.filter((r) => r.tracks.length > 0)
 }
 
 export async function getTrack(

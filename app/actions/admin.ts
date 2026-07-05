@@ -15,7 +15,15 @@ import { and, asc, desc, eq } from 'drizzle-orm'
 import { revalidatePath } from 'next/cache'
 
 function revalidateSite() {
+  // Root layout purge covers every nested static page.
   revalidatePath('/', 'layout')
+  // Explicitly purge the dynamic route patterns so release/track edits show up
+  // immediately on their detail pages, not just after the ISR window.
+  revalidatePath('/lyrics')
+  revalidatePath('/lyrics/[albumSlug]', 'page')
+  revalidatePath('/lyrics/[albumSlug]/[trackSlug]', 'page')
+  revalidatePath('/releases')
+  revalidatePath('/releases/[slug]', 'page')
 }
 
 // ---------- Releases ----------
