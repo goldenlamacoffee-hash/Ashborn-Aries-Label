@@ -11,6 +11,7 @@ import {
 } from '@/app/actions/admin'
 import { AdminField, AdminTable, adminInputClass } from '@/components/admin/admin-ui'
 import { MediaPicker } from '@/components/admin/media-picker'
+import { ReleaseTracksPanel, type PanelTrack } from '@/components/admin/release-tracks-panel'
 import { cn } from '@/lib/utils'
 
 export type ReleaseRow = ReleaseInput & { id: number }
@@ -36,9 +37,11 @@ const emptyRelease: ReleaseInput = {
 export function ReleasesManager({
   releases,
   artistOptions,
+  tracksByRelease = {},
 }: {
   releases: ReleaseRow[]
   artistOptions: { id: number; name: string }[]
+  tracksByRelease?: Record<number, PanelTrack[]>
 }) {
   const router = useRouter()
   const [editingId, setEditingId] = useState<number | 'new' | null>(null)
@@ -281,6 +284,13 @@ export function ReleasesManager({
               Published
             </label>
           </div>
+          {typeof editingId === 'number' && (
+            <ReleaseTracksPanel
+              releaseId={editingId}
+              releaseSlug={form.slug}
+              tracks={tracksByRelease[editingId] ?? []}
+            />
+          )}
           {error && (
             <p role="alert" className="text-xs text-ember">
               {error}
