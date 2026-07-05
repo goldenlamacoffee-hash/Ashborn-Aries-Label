@@ -6,9 +6,9 @@ import { getSiteSettings } from '@/lib/cms'
 export async function HeroSection() {
   const siteSettings = await getSiteSettings()
 
-  const desktopImage = siteSettings.heroImage || '/images/brand/hero-clean-wide.png'
+  const desktopImage = siteSettings.heroImage || '/images/brand/hero-ram.png'
   const mobileImage =
-    siteSettings.heroMobileImage || siteSettings.heroImage || '/images/brand/hero-clean-mobile.png'
+    siteSettings.heroMobileImage || siteSettings.heroImage || '/images/brand/hero-ram.png'
 
   // Overlay strength (0–100) controls how dark the scrim behind the headline is.
   const strength =
@@ -26,7 +26,7 @@ export async function HeroSection() {
           fill
           priority
           sizes="100vw"
-          className="object-cover object-[center_25%] opacity-80 sm:hidden"
+          className="object-cover object-[center_22%] opacity-80 sm:hidden"
         />
         {/* Desktop / tablet: wide crop */}
         <Image
@@ -35,7 +35,7 @@ export async function HeroSection() {
           fill
           priority
           sizes="100vw"
-          className="hidden object-cover object-center opacity-90 sm:block"
+          className="hidden object-cover object-[center_30%] opacity-90 sm:block"
         />
 
         {/* Base vertical gradient — keeps top (header) and bottom (content) readable */}
