@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getLyricAlbums, getTrack } from '@/lib/cms'
+import { publicStoryNote } from '@/lib/utils'
 import { SectionDivider } from '@/components/section-divider'
 import { BronzePanel } from '@/components/bronze-panel'
 import { ShareButtons } from '@/components/share-buttons'
@@ -24,7 +25,7 @@ export async function generateMetadata({
   if (!result) return {}
   return {
     title: `${result.track.title} — Lyrics`,
-    description: result.track.storyNote,
+    description: publicStoryNote(result.track.storyNote),
     ...(result.release.coverImage
       ? { openGraph: { images: [{ url: result.release.coverImage }] } }
       : {}),
@@ -61,14 +62,16 @@ export default async function TrackLyricsPage({
       </div>
 
       {/* Story note */}
-      <BronzePanel glow={false} className="mt-10 p-6">
-        <h2 className="mb-3 font-serif text-sm font-semibold uppercase tracking-[0.2em] text-gold">
-          Story Note
-        </h2>
-        <p className="font-sans text-sm leading-relaxed text-muted-foreground text-pretty">
-          {track.storyNote}
-        </p>
-      </BronzePanel>
+      {publicStoryNote(track.storyNote) && (
+        <BronzePanel glow={false} className="mt-10 p-6">
+          <h2 className="mb-3 font-serif text-sm font-semibold uppercase tracking-[0.2em] text-gold">
+            Story Note
+          </h2>
+          <p className="font-sans text-sm leading-relaxed text-muted-foreground text-pretty">
+            {publicStoryNote(track.storyNote)}
+          </p>
+        </BronzePanel>
+      )}
 
       {/* Spoken intro */}
       {track.spokenIntro && (

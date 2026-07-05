@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Search } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { cn, publicStoryNote } from '@/lib/utils'
 import type { Release } from '@/lib/data'
 import { BronzePanel } from '@/components/bronze-panel'
 
@@ -123,7 +123,7 @@ export function LyricsArchive({ albums }: { albums: Release[] }) {
                         {track.title}
                       </h3>
                       <p className="flex-1 font-sans text-sm leading-relaxed text-muted-foreground">
-                        {track.storyNote}
+                        {publicStoryNote(track.storyNote)}
                       </p>
                       <Link
                         href={`/lyrics/${album.slug}/${track.slug}`}
