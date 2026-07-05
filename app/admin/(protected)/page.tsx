@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { adminGetStats, adminListReleases } from '@/app/actions/admin'
 import { AdminPageHeader, StatCard } from '@/components/admin/admin-ui'
+import { SyncStatusPanel } from '@/components/admin/sync-status-panel'
 
 export default async function AdminDashboard() {
   const [stats, releases] = await Promise.all([adminGetStats(), adminListReleases()])
@@ -18,8 +19,10 @@ export default async function AdminDashboard() {
     <>
       <AdminPageHeader
         title="Dashboard"
-        description="Overview of the Ashborn Aries Label catalog. All content is stored in the database — changes go live immediately."
+        description="Overview of the Ashborn Aries Label catalog. All content is stored in the database — saves publish instantly here and reach the live site within 60 seconds."
       />
+
+      <SyncStatusPanel />
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatCard

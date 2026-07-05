@@ -243,6 +243,50 @@ export async function adminDeleteMedia(id: number) {
   revalidatePath('/admin/media')
 }
 
+// ---------- Diagnostics ----------
+
+/** Manually purge every public page cache on this deployment. */
+export async function adminPublishNow() {
+  await requireAdmin()
+  revalidateSite()
+  return { ok: true, at: new Date().toISOString() }
+}
+
+/**
+ * Live sync diagnostics: proves reads/writes hit the database and shows
+ * when each content type last changed.
+ */
+export async function adminGetDiagnostics() {
+  await requireAdmin()
+  const started = Date.now()
+  const [releaseRow, trackRow, artistRow, settingRow, mediaRow] = await Promise.all([
+    db.select({ at: releases.updatedAt }).from(releases).orderBy(desc(releases.updatedAt)).limit(1),
+    db.select({ at: tracks.updatedAt }).from(tracks).orderBy(desc(tracks.updatedAt)).limit(1),
+    db.select({ at: artists.updatedAt }).from(artists).orderBy(desc(artists.updatedAt)).limit(1),
+    db
+      .select({ at: siteSettings.updatedAt })
+      .from(siteSettings)
+      .orderBy(desc(siteSettings.updatedAt))
+      .limit(1),
+    db
+      .select({ at: mediaAssets.updatedAt })
+      .from(mediaAssets)
+      .orderBy(desc(mediaAssets.updatedAt))
+      .limit(1),
+  ])
+  return {
+    dbLatencyMs: Date.now() - started,
+    serverTime: new Date().toISOString(),
+    lastUpdated: {
+      releases: releaseRow[0]?.at?.toISOString() ?? null,
+      tracks: trackRow[0]?.at?.toISOString() ?? null,
+      artists: artistRow[0]?.at?.toISOString() ?? null,
+      settings: settingRow[0]?.at?.toISOString() ?? null,
+      media: mediaRow[0]?.at?.toISOString() ?? null,
+    },
+  }
+}
+
 // ---------- Dashboard stats ----------
 
 export async function adminGetStats() {
