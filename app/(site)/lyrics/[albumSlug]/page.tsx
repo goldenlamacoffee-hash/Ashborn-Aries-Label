@@ -33,7 +33,14 @@ export default async function AlbumLyricsPage({
 }) {
   const { albumSlug } = await params
   const album = await getReleaseBySlug(albumSlug)
-  if (!album || album.type !== 'album') notFound()
+  // Any published release with published tracks has a lyrics archive (album,
+  // single, EP, instrumental collection). Only 404 when it has no track content.
+  if (!album || album.tracks.length === 0) notFound()
+
+  const archiveLabel =
+    album.type === 'album'
+      ? 'Album Archive'
+      : `${album.type.charAt(0).toUpperCase()}${album.type.slice(1)} Archive`
 
   return (
     <div className="mx-auto max-w-4xl px-4 pb-24 pt-32 md:px-6 md:pt-40">
@@ -57,7 +64,7 @@ export default async function AlbumLyricsPage({
         </div>
         <div className="flex flex-col items-center gap-2 md:items-start">
           <p className="font-sans text-xs font-semibold uppercase tracking-[0.3em] text-gold/80">
-            Album Archive
+            {archiveLabel}
           </p>
           <h1 className="foil-text font-serif text-3xl font-bold uppercase tracking-wide md:text-4xl text-balance">
             {album.title}
