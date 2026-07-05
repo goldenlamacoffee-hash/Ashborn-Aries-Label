@@ -3,6 +3,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import { getReleaseBySlug, getReleases } from '@/lib/cms'
+import { publicStoryNote } from '@/lib/utils'
 import { StreamingButtons } from '@/components/streaming-buttons'
 import { ShareButtons } from '@/components/share-buttons'
 import { SectionDivider } from '@/components/section-divider'
@@ -119,7 +120,7 @@ export default async function ReleaseDetailPage({
                 ) : (
                   <span className="font-sans text-sm font-medium text-foreground">{track.title}</span>
                 )}
-                <span className="font-sans text-xs text-muted-foreground">{track.storyNote}</span>
+                  <span className="font-sans text-xs text-muted-foreground">{publicStoryNote(track.storyNote)}</span>
               </div>
               {track.duration && (
                 <span className="shrink-0 font-sans text-xs text-muted-foreground">

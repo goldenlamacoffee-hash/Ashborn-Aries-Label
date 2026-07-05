@@ -10,17 +10,19 @@ import {
 } from '@/app/actions/admin'
 import { AdminField, AdminTable, adminInputClass } from '@/components/admin/admin-ui'
 
-export type TrackRow = TrackInput & { id: number }
+export type TrackRow = TrackInput & { id: number; updatedAt: string }
 
 export function TracksManager({
   tracks,
   releaseOptions,
+  initialReleaseFilter,
 }: {
   tracks: TrackRow[]
-  releaseOptions: { id: number; title: string }[]
+  releaseOptions: { id: number; title: string; slug: string }[]
+  initialReleaseFilter?: number
 }) {
   const router = useRouter()
-  const [releaseFilter, setReleaseFilter] = useState<number | 'all'>('all')
+  const [releaseFilter, setReleaseFilter] = useState<number | 'all'>(initialReleaseFilter ?? 'all')
   const [editingId, setEditingId] = useState<number | 'new' | null>(null)
   const [form, setForm] = useState<TrackInput | null>(null)
   const [busy, setBusy] = useState(false)
@@ -30,6 +32,10 @@ export function TracksManager({
 
   function releaseTitle(id: number) {
     return releaseOptions.find((r) => r.id === id)?.title ?? `#${id}`
+  }
+
+  function releaseSlug(id: number) {
+    return releaseOptions.find((r) => r.id === id)?.slug ?? ''
   }
 
   function startNew() {
@@ -63,8 +69,16 @@ export function TracksManager({
 
   async function handleSave() {
     if (!form || busy) return
-    if (!form.title.trim() || !form.slug.trim()) {
-      setError('Title and slug are required.')
+    if (!form.title.trim()) {
+      setError('Title is required.')
+      return
+    }
+    if (!form.releaseId) {
+      setError('Every track must belong to a release. Select one.')
+      return
+    }
+    if (!Number.isInteger(form.trackNumber) || form.trackNumber < 1) {
+      setError('Track number must be a positive whole number.')
       return
     }
     setBusy(true)
@@ -77,8 +91,11 @@ export function TracksManager({
       }
       setEditingId(null)
       router.refresh()
-    } catch {
-      setError('Save failed. Check the slug is unique within the release.')
+    } catch (err) {
+      const msg = err instanceof Error && err.message && !err.message.includes('unexpected response')
+        ? err.message
+        : 'Save failed. Check the track number and slug are unique within this release.'
+      setError(msg)
     } finally {
       setBusy(false)
     }
@@ -127,23 +144,35 @@ export function TracksManager({
         </button>
       </div>
 
-      <AdminTable headers={['#', 'Title', 'Release', 'Duration', 'Status', 'Actions']}>
+      <AdminTable headers={['#', 'Title', 'Release', 'Status', 'Updated', 'Actions']}>
         {visible.map((row) => (
           <tr key={row.id}>
             <td className="px-4 py-3 text-muted-foreground">{row.trackNumber}</td>
             <td className="px-4 py-3 text-foreground">{row.title}</td>
             <td className="px-4 py-3 text-muted-foreground">{releaseTitle(row.releaseId)}</td>
-            <td className="px-4 py-3 text-muted-foreground">{row.duration}</td>
             <td className="px-4 py-3">
               <span className={row.published ? 'text-xs uppercase tracking-widest text-accent' : 'text-xs uppercase tracking-widest text-muted-foreground'}>
                 {row.published ? 'Published' : 'Draft'}
               </span>
+            </td>
+            <td className="px-4 py-3 text-xs text-muted-foreground">
+              {new Date(row.updatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
             </td>
             <td className="px-4 py-3">
               <div className="flex gap-3">
                 <button type="button" onClick={() => startEdit(row)} className="text-xs uppercase tracking-widest text-gold hover:underline">
                   Edit
                 </button>
+                {row.published && releaseSlug(row.releaseId) && (
+                  <a
+                    href={`/lyrics/${releaseSlug(row.releaseId)}/${row.slug}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground hover:underline"
+                  >
+                    View
+                  </a>
+                )}
                 <button type="button" onClick={() => handleDelete(row.id)} className="text-xs uppercase tracking-widest text-ember hover:underline">
                   Delete
                 </button>

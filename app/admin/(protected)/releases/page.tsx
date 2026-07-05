@@ -1,9 +1,25 @@
-import { adminListArtists, adminListReleases } from '@/app/actions/admin'
+import { adminListArtists, adminListReleases, adminListTracks } from '@/app/actions/admin'
 import { AdminPageHeader } from '@/components/admin/admin-ui'
 import { ReleasesManager, type ReleaseRow } from '@/components/admin/releases-manager'
+import type { PanelTrack } from '@/components/admin/release-tracks-panel'
 
 export default async function AdminReleasesPage() {
-  const [releaseRows, artistRows] = await Promise.all([adminListReleases(), adminListArtists()])
+  const [releaseRows, artistRows, trackRows] = await Promise.all([
+    adminListReleases(),
+    adminListArtists(),
+    adminListTracks(),
+  ])
+
+  const tracksByRelease: Record<number, PanelTrack[]> = {}
+  for (const t of trackRows) {
+    ;(tracksByRelease[t.releaseId] ??= []).push({
+      id: t.id,
+      slug: t.slug,
+      title: t.title,
+      trackNumber: t.trackNumber,
+      published: t.published,
+    })
+  }
 
   const releases: ReleaseRow[] = releaseRows.map((r) => ({
     id: r.id,
@@ -33,6 +49,7 @@ export default async function AdminReleasesPage() {
       <ReleasesManager
         releases={releases}
         artistOptions={artistRows.map((a) => ({ id: a.id, name: a.name }))}
+        tracksByRelease={tracksByRelease}
       />
     </div>
   )

@@ -96,18 +96,89 @@ export async function adminListTracks(releaseId?: number) {
   return db.select().from(tracks).orderBy(asc(tracks.releaseId), asc(tracks.trackNumber))
 }
 
+const slugify = (s: string) =>
+  s
+    .toLowerCase()
+    .replace(/['’]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+
+/**
+ * Validates track input. Throws with a human-readable message on failure.
+ * - release must exist
+ * - trackNumber must be a positive integer, unique within the release
+ * - slug is normalized and must be unique within the release
+ */
+async function validateTrackInput(input: Partial<TrackInput>, excludeTrackId?: number) {
+  if (input.releaseId !== undefined) {
+    const [release] = await db
+      .select({ id: releases.id })
+      .from(releases)
+      .where(eq(releases.id, input.releaseId))
+    if (!release) throw new Error('Selected release does not exist. Tracks must belong to a release.')
+  }
+  if (input.trackNumber !== undefined) {
+    if (!Number.isInteger(input.trackNumber) || input.trackNumber < 1) {
+      throw new Error('Track number must be a positive whole number.')
+    }
+  }
+  if (input.releaseId !== undefined && input.trackNumber !== undefined) {
+    const clash = await db
+      .select({ id: tracks.id })
+      .from(tracks)
+      .where(and(eq(tracks.releaseId, input.releaseId), eq(tracks.trackNumber, input.trackNumber)))
+    if (clash.some((c) => c.id !== excludeTrackId)) {
+      throw new Error(`Track number ${input.trackNumber} is already used in this release.`)
+    }
+  }
+  if (input.releaseId !== undefined && input.slug !== undefined) {
+    const slugClash = await db
+      .select({ id: tracks.id })
+      .from(tracks)
+      .where(and(eq(tracks.releaseId, input.releaseId), eq(tracks.slug, input.slug)))
+    if (slugClash.some((c) => c.id !== excludeTrackId)) {
+      throw new Error('A track with this slug already exists in this release.')
+    }
+  }
+}
+
 export async function adminCreateTrack(input: TrackInput) {
   await requireAdmin()
-  const [row] = await db.insert(tracks).values(input).returning()
+  const clean = { ...input, slug: slugify(input.slug || input.title) }
+  if (!clean.title.trim()) throw new Error('Title is required.')
+  if (!clean.slug) throw new Error('Slug is required.')
+  if (!clean.releaseId) throw new Error('Tracks must belong to a release.')
+  await validateTrackInput(clean)
+  const [row] = await db.insert(tracks).values(clean).returning()
   revalidateSite()
   return row
 }
 
 export async function adminUpdateTrack(id: number, input: Partial<TrackInput>) {
   await requireAdmin()
+  const clean = { ...input }
+  if (clean.slug !== undefined) {
+    clean.slug = slugify(clean.slug)
+    if (!clean.slug) throw new Error('Slug is required.')
+  }
+  if (clean.releaseId !== undefined && !clean.releaseId) {
+    throw new Error('Tracks must belong to a release.')
+  }
+  // For uniqueness checks we need the effective releaseId/trackNumber
+  const [existing] = await db.select().from(tracks).where(eq(tracks.id, id))
+  if (!existing) throw new Error('Track not found.')
+  await validateTrackInput(
+    {
+      ...clean,
+      releaseId: clean.releaseId ?? existing.releaseId,
+      trackNumber: clean.trackNumber ?? existing.trackNumber,
+      slug: clean.slug ?? existing.slug,
+    },
+    id,
+  )
   const [row] = await db
     .update(tracks)
-    .set({ ...input, updatedAt: new Date() })
+    .set({ ...clean, updatedAt: new Date() })
     .where(eq(tracks.id, id))
     .returning()
   revalidateSite()
@@ -117,6 +188,25 @@ export async function adminUpdateTrack(id: number, input: Partial<TrackInput>) {
 export async function adminDeleteTrack(id: number) {
   await requireAdmin()
   await db.delete(tracks).where(eq(tracks.id, id))
+  revalidateSite()
+}
+
+/** Renumber all tracks of a release to match the given ordered list of track ids. */
+export async function adminReorderTracks(releaseId: number, orderedTrackIds: number[]) {
+  await requireAdmin()
+  // Two-phase renumber to avoid transient unique collisions
+  for (let i = 0; i < orderedTrackIds.length; i++) {
+    await db
+      .update(tracks)
+      .set({ trackNumber: 1000 + i })
+      .where(and(eq(tracks.id, orderedTrackIds[i]), eq(tracks.releaseId, releaseId)))
+  }
+  for (let i = 0; i < orderedTrackIds.length; i++) {
+    await db
+      .update(tracks)
+      .set({ trackNumber: i + 1, updatedAt: new Date() })
+      .where(and(eq(tracks.id, orderedTrackIds[i]), eq(tracks.releaseId, releaseId)))
+  }
   revalidateSite()
 }
 

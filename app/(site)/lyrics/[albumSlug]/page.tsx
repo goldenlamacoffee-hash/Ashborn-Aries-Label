@@ -3,6 +3,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import { getLyricAlbums, getReleaseBySlug } from '@/lib/cms'
+import { publicStoryNote } from '@/lib/utils'
 import { SectionDivider } from '@/components/section-divider'
 
 export async function generateStaticParams() {
@@ -86,7 +87,7 @@ export default async function AlbumLyricsPage({
                 <span className="font-sans text-sm font-medium text-foreground transition-colors group-hover:text-gold">
                   {track.title}
                 </span>
-                <span className="font-sans text-xs text-muted-foreground">{track.storyNote}</span>
+                <span className="font-sans text-xs text-muted-foreground">{publicStoryNote(track.storyNote)}</span>
               </div>
               <span className="shrink-0 font-sans text-xs font-semibold uppercase tracking-widest text-gold/70 transition-colors group-hover:text-gold">
                 Read
