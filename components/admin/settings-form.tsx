@@ -78,12 +78,34 @@ export function SettingsForm({ initial }: { initial: SiteSettings }) {
             hint="Used in the site header, footer, and admin."
           />
           <MediaPicker
-            label="Homepage hero image"
+            label="Homepage hero image (desktop)"
             value={settings.heroImage}
             onChange={(url) => update({ heroImage: url })}
             categoryHint="hero-background"
-            hint="Full-width artwork behind the homepage hero."
+            hint="Wide, decorative artwork behind the homepage hero. Must NOT contain baked-in text — the headline is added as live text on top."
           />
+          <MediaPicker
+            label="Homepage hero image (mobile)"
+            value={settings.heroMobileImage}
+            onChange={(url) => update({ heroMobileImage: url })}
+            categoryHint="hero-background"
+            hint="Portrait-friendly crop shown on phones. Leave empty to reuse the desktop image."
+          />
+          <AdminField
+            label={`Hero overlay darkness (${settings.heroOverlayStrength ?? 70}%)`}
+            id="set-hero-overlay"
+          >
+            <input
+              id="set-hero-overlay"
+              type="range"
+              min={0}
+              max={100}
+              step={5}
+              className="w-full accent-primary"
+              value={settings.heroOverlayStrength ?? 70}
+              onChange={(e) => update({ heroOverlayStrength: Number(e.target.value) })}
+            />
+          </AdminField>
           <MediaPicker
             label="Default OG / social share image"
             value={settings.ogImage}
