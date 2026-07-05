@@ -71,6 +71,10 @@ export interface SiteSettings {
   social: { label: string; href: string }[]
   logoUrl: string
   heroImage: string
+  /** Portrait-optimized hero background for phones. Falls back to heroImage when empty. */
+  heroMobileImage: string
+  /** Darkness of the overlay behind the hero headline, 0–100. Higher = darker/more readable. */
+  heroOverlayStrength: number
   ogImage: string
   footerLogoUrl: string
   faviconUrl: string
@@ -100,7 +104,9 @@ export const siteSettings: SiteSettings = {
     { label: 'Instagram', href: '#' },
   ],
   logoUrl: '/images/brand/brand-seal.webp',
-  heroImage: '/images/brand/hero-wide.webp',
+  heroImage: '/images/brand/hero-clean-wide.png',
+  heroMobileImage: '/images/brand/hero-clean-mobile.png',
+  heroOverlayStrength: 70,
   ogImage: '/images/brand/hero-square.webp',
   footerLogoUrl: '',
   faviconUrl: '',
